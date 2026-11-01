@@ -1,0 +1,108 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_script"]
+[ext_resource type="Material" path="res://assets/materials/mat_player_body.tres" id="2_body_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_player_accent.tres" id="3_accent_mat"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_torso"]
+material = ExtResource("2_body_mat")
+size = Vector3(0.6, 0.65, 0.38)
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+material = ExtResource("2_body_mat")
+size = Vector3(0.42, 0.42, 0.42)
+
+[sub_resource type="BoxMesh" id="BoxMesh_visor"]
+material = ExtResource("3_accent_mat")
+size = Vector3(0.34, 0.14, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pack"]
+material = ExtResource("3_accent_mat")
+size = Vector3(0.38, 0.48, 0.22)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_limb"]
+material = ExtResource("2_body_mat")
+top_radius = 0.09
+bottom_radius = 0.09
+height = 0.52
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_leg"]
+material = ExtResource("2_body_mat")
+top_radius = 0.11
+bottom_radius = 0.1
+height = 0.58
+radial_segments = 8
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+
+[node name="Torso" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("BoxMesh_torso")
+
+[node name="Head" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+mesh = SubResource("BoxMesh_head")
+
+[node name="Visor" type="MeshInstance3D" parent="Model/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.2)
+mesh = SubResource("BoxMesh_visor")
+
+[node name="Backpack" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0.24)
+mesh = SubResource("BoxMesh_pack")
+
+[node name="ArmL_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 0.26, 0)
+
+[node name="ArmMesh" type="MeshInstance3D" parent="Model/ArmL_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("CylinderMesh_limb")
+
+[node name="ArmR_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.26, 0)
+
+[node name="ArmMesh" type="MeshInstance3D" parent="Model/ArmR_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("CylinderMesh_limb")
+
+[node name="LegL_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, -0.24, 0)
+
+[node name="LegMesh" type="MeshInstance3D" parent="Model/LegL_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.28, 0)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="LegR_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, -0.24, 0)
+
+[node name="LegMesh" type="MeshInstance3D" parent="Model/LegR_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.28, 0)
+mesh = SubResource("CylinderMesh_leg")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+top_level = true
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0, 0)
+collision_mask = 1
+spring_length = 5.0
+margin = 0.2
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
+current = true
+fov = 70.0
