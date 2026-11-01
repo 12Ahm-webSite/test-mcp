@@ -10,7 +10,7 @@ signal player_eliminated(killer: Node3D)
 signal player_respawned()
 
 @export_group("Combat & Health")
-@export var max_health: float = 100.0
+@export var max_health: float = 120.0
 
 @export_group("Locomotion")
 @export var walk_speed: float = 6.5
@@ -63,19 +63,25 @@ const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
 
 # Combat & Weapon state
 var character_name: String = "Unit-07"
-var health: float = 100.0
+var health: float = 120.0
 var is_dead: bool = false
-var unlocked_weapons: Array[int] = [WeaponData.WeaponType.PISTOL]
+var unlocked_weapons: Array[int] = [
+	WeaponData.WeaponType.PISTOL,
+	WeaponData.WeaponType.SMG,
+	WeaponData.WeaponType.GRENADE
+]
 var current_weapon: int = WeaponData.WeaponType.PISTOL
 var ammo: Dictionary = {
 	WeaponData.WeaponType.PISTOL: 999,
-	WeaponData.WeaponType.SMG: 0,
-	WeaponData.WeaponType.GRENADE: 0
+	WeaponData.WeaponType.SMG: 80,
+	WeaponData.WeaponType.GRENADE: 3
 }
 var _fire_timer: float = 0.0
 var _recoil_offset: float = 0.0
 var _step_bob_time: float = 0.0
 var _is_first_person: bool = true
+var is_aiming: bool = false
+var ads_fov: float = 44.0
 
 # Camera state
 var _camera_yaw: float = 0.0
@@ -146,12 +152,6 @@ func _setup_input_map() -> void:
 				ev.physical_keycode = key as Key
 				InputMap.action_add_event(action, ev)
 				
-	# Also allow right-click for dash
-	if InputMap.has_action("dash"):
-		var mouse_ev := InputEventMouseButton.new()
-		mouse_ev.button_index = MOUSE_BUTTON_RIGHT
-		InputMap.action_add_event("dash", mouse_ev)
-
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_active or is_dead:
 		return
@@ -167,40 +167,46 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
-	# Mouse look rotation
+	# Mouse look rotation (scaled by ADS zoom)
 	var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or DisplayServer.get_name() == "headless"
 	if is_captured and event is InputEventMouseMotion:
+		var sens: float = mouse_sensitivity * (0.50 if is_aiming else 1.0)
 		if _is_first_person:
-			rotate_y(-event.relative.x * mouse_sensitivity)
-			_camera_pitch = clamp(_camera_pitch - event.relative.y * mouse_sensitivity, deg_to_rad(-85.0), deg_to_rad(85.0))
+			rotate_y(-event.relative.x * sens)
+			_camera_pitch = clamp(_camera_pitch - event.relative.y * sens, deg_to_rad(-85.0), deg_to_rad(85.0))
 			if head:
 				head.rotation.x = _camera_pitch
 		else:
-			_camera_yaw -= event.relative.x * mouse_sensitivity
-			_camera_pitch -= event.relative.y * mouse_sensitivity
+			_camera_yaw -= event.relative.x * sens
+			_camera_pitch -= event.relative.y * sens
 			_camera_pitch = clamp(_camera_pitch, min_pitch, max_pitch)
 
-	# Weapon selection (1, 2, 3)
+	# Weapon selection (1, 2, 3) - support physical_keycode and keycode for all keyboard layouts
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1:
+		var pk: Key = event.physical_keycode
+		var kc: Key = event.keycode
+		if pk == KEY_1 or kc == KEY_1 or pk == KEY_KP_1:
 			select_weapon(WeaponData.WeaponType.PISTOL)
-		elif event.keycode == KEY_2:
+		elif pk == KEY_2 or kc == KEY_2 or pk == KEY_KP_2:
 			select_weapon(WeaponData.WeaponType.SMG)
-		elif event.keycode == KEY_3:
+		elif pk == KEY_3 or kc == KEY_3 or pk == KEY_KP_3:
 			select_weapon(WeaponData.WeaponType.GRENADE)
 
 	# Weapon cycle (mouse wheel)
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			cycle_weapon(1)
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			cycle_weapon(-1)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			cycle_weapon(1)
 
 func _physics_process(delta: float) -> void:
 	# Update cooldown timers
 	if _dash_cooldown_timer > 0.0:
 		_dash_cooldown_timer -= delta
 		dash_cooldown_updated.emit(clamp(_dash_cooldown_timer, 0.0, dash_cooldown), dash_cooldown)
+
+	# Aim Down Sights (Right Mouse Button)
+	is_aiming = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) and is_active and not is_dead
 
 	# Fire cooldown & weapon recoil recovery
 	if _fire_timer > 0.0:
@@ -209,15 +215,21 @@ func _physics_process(delta: float) -> void:
 	if weapon_socket:
 		if _is_first_person:
 			var h_speed := Vector2(velocity.x, velocity.z).length()
+			var bob_mult := 0.25 if is_aiming else 1.0
+			var bob_x: float = 0.0
+			var bob_y: float = 0.0
 			if is_on_floor() and h_speed > 0.5:
 				_step_bob_time += delta * 10.0 * clamp(h_speed / walk_speed, 0.8, 1.8)
-				var bob_x: float = cos(_step_bob_time * 0.5) * 0.012
-				var bob_y: float = absf(sin(_step_bob_time)) * 0.015
-				weapon_socket.position = Vector3(0.24 + bob_x, -0.20 + bob_y, -0.42 + _recoil_offset)
+				bob_x = cos(_step_bob_time * 0.5) * 0.012 * bob_mult
+				bob_y = absf(sin(_step_bob_time)) * 0.015 * bob_mult
 			else:
 				_step_bob_time += delta * 2.0
-				var breath_y: float = sin(_step_bob_time) * 0.004
-				weapon_socket.position = Vector3(0.24, -0.20 + breath_y, -0.42 + _recoil_offset)
+				bob_y = sin(_step_bob_time) * 0.004 * bob_mult
+				
+			var hip_pos := Vector3(0.24 + bob_x, -0.20 + bob_y, -0.42 + _recoil_offset)
+			var ads_pos := Vector3(0.0 + (bob_x * 0.2), -0.15 + (bob_y * 0.2), -0.36 + (_recoil_offset * 0.5))
+			var target_pos := ads_pos if is_aiming else hip_pos
+			weapon_socket.position = weapon_socket.position.lerp(target_pos, 16.0 * delta)
 		else:
 			weapon_socket.position.z = -0.32 + _recoil_offset
 
@@ -364,22 +376,22 @@ func _start_dash(move_dir: Vector3) -> void:
 		audio.play_dash()
 
 func _update_camera(delta: float) -> void:
-	if not camera_pivot:
-		return
-		
-	camera_pivot.global_position = camera_pivot.global_position.lerp(global_position + Vector3(0, 1.4, 0), 20.0 * delta)
-	camera_pivot.rotation.y = _camera_yaw
-	if spring_arm:
-		spring_arm.rotation.x = _camera_pitch
+	if camera_pivot:
+		camera_pivot.global_position = camera_pivot.global_position.lerp(global_position + Vector3(0, 1.4, 0), 20.0 * delta)
+		camera_pivot.rotation.y = _camera_yaw
+		if spring_arm:
+			spring_arm.rotation.x = _camera_pitch
 
-	# Dynamic FOV based on state
+	# Dynamic FOV based on state (ADS zoom, Dash, Sprint)
 	if camera:
 		var target_fov := base_fov
-		if is_dashing:
+		if is_aiming:
+			target_fov = ads_fov
+		elif is_dashing:
 			target_fov = dash_fov
 		elif Input.is_action_pressed("sprint") and Vector2(velocity.x, velocity.z).length() > walk_speed:
 			target_fov = sprint_fov
-		camera.fov = lerp(camera.fov, target_fov, 8.0 * delta)
+		camera.fov = lerp(camera.fov, target_fov, 14.0 * delta)
 
 		# Trauma camera shake
 		if _shake_trauma > 0.0:
@@ -482,8 +494,14 @@ func respawn_at(pos: Vector3) -> void:
 	is_dead = false
 	is_active = true
 	visible = true
+	if _is_first_person and model:
+		model.visible = false
+	activate_shield(3.0) # 3-second spawn invulnerability protection
+	ammo[WeaponData.WeaponType.SMG] = maxi(ammo.get(WeaponData.WeaponType.SMG, 0), 40)
 	health_changed.emit(health, max_health)
+	ammo_updated.emit(current_weapon, ammo.get(current_weapon, 0))
 	player_respawned.emit()
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 # --- Weapon & Combat Systems ---
 
@@ -571,8 +589,10 @@ func try_shoot() -> bool:
 		var target_pt: Vector3 = hit.position if not hit.is_empty() else cam_pos + cam_forward * 80.0
 		shoot_dir = (target_pt - origin).normalized()
 	
-	# Spread deviation
+	# Spread deviation (sharply reduced when aiming down sights for pin-point accuracy)
 	var spread: float = w_data.get("spread", 0.015)
+	if is_aiming:
+		spread *= 0.20 # 80% tighter accuracy when aiming down sights
 	shoot_dir = (shoot_dir + Vector3(randf_range(-spread, spread), randf_range(-spread, spread), randf_range(-spread, spread))).normalized()
 	
 	# Spawn Projectile

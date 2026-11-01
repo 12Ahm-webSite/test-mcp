@@ -69,7 +69,7 @@ size = Vector3(2, 4, 54)
 material = ExtResource("3_wall")
 size = Vector3(1.5, 4, 54)
 
-[node name="Battle1Ruins" type="Node3D"]
+[node name="Battle1Ruins" type="Node3D" groups=["battle_manager"]]
 script = ExtResource("1_bm")
 sector_id = "battle_1"
 sector_title = "Sector 1: Sunken Ruins"

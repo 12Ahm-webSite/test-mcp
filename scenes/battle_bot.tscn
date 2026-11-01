@@ -6,8 +6,8 @@
 [ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/MGP7/MGP7_Rigged.glb" id="4_smg"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bot"]
-radius = 0.45
-height = 1.8
+radius = 0.75
+height = 2.1
 
 [node name="BattleBot" type="CharacterBody3D"]
 collision_layer = 4

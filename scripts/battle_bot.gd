@@ -31,6 +31,7 @@ var _reaction_timer: float = 0.5
 
 # Weapon & Combat
 const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
+const PICKUP_SCENE := preload("res://scenes/pickup_weapon.tscn")
 var current_weapon: int = WeaponData.WeaponType.PISTOL
 var ammo: Dictionary = {
 	WeaponData.WeaponType.PISTOL: 999,
@@ -62,10 +63,27 @@ var speed_boost_factor: float = 1.0
 func _ready() -> void:
 	add_to_group("battle_bot")
 	add_to_group("combatant")
-	health = max_health
+	_apply_difficulty()
 	_update_billboard()
 	_update_weapon_models()
 	_pick_new_roam_target()
+
+func _apply_difficulty() -> void:
+	var bm = get_tree().get_first_node_in_group("battle_manager")
+	if bm and bm.has_method("get_difficulty_params"):
+		var p: Dictionary = bm.get_difficulty_params()
+		max_health = p.get("bot_max_health", 65.0)
+		walk_speed = p.get("bot_walk_speed", 3.0)
+		run_speed = p.get("bot_run_speed", 4.5)
+		fire_accuracy = p.get("bot_accuracy", 0.45)
+		_reaction_timer = p.get("bot_reaction_delay", 0.8)
+	else:
+		max_health = 65.0
+		walk_speed = 3.0
+		run_speed = 4.5
+		fire_accuracy = 0.45
+		_reaction_timer = 0.8
+	health = max_health
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -271,8 +289,13 @@ func _try_bot_shoot(target_pos: Vector3) -> void:
 	if _fire_cooldown_timer > 0.0:
 		return
 		
-	var w_data = WeaponData.get_weapon(current_weapon)
-	_fire_cooldown_timer = w_data.get("fire_rate", 0.3) * randf_range(1.0, 1.3)
+	var w_data: Dictionary = WeaponData.get_weapon(current_weapon).duplicate()
+	var bm = get_tree().get_first_node_in_group("battle_manager")
+	var bot_dmg: float = 8.0
+	if bm and bm.has_method("get_difficulty_params"):
+		bot_dmg = bm.get_difficulty_params().get("bot_damage", 8.0)
+	w_data["damage"] = bot_dmg
+	_fire_cooldown_timer = w_data.get("fire_rate", 0.3) * randf_range(1.1, 1.4)
 	
 	var origin: Vector3 = muzzle_point.global_position if muzzle_point else global_position + Vector3(0, 1.1, -0.4)
 	var aim_target: Vector3 = target_pos + Vector3(0, 0.9, 0)
@@ -363,6 +386,7 @@ func _die(killer: Node3D) -> void:
 	velocity = Vector3.ZERO
 	set_physics_process(false)
 	
+	_drop_loot()
 	eliminated.emit(character_name, killer)
 	
 	if is_inside_tree() and get_tree():
@@ -373,6 +397,25 @@ func _die(killer: Node3D) -> void:
 		# Respawn after 2.5s
 		await get_tree().create_timer(2.5).timeout
 		_respawn()
+
+func _drop_loot() -> void:
+	var parent_node := get_parent()
+	if not parent_node:
+		return
+	var pickup = PICKUP_SCENE.instantiate()
+	var roll := randf()
+	if current_weapon == WeaponData.WeaponType.SMG or roll < 0.60:
+		pickup.pickup_type = PickupWeapon.PickupType.SMG
+	elif roll < 0.85:
+		pickup.pickup_type = PickupWeapon.PickupType.GRENADE
+	else:
+		pickup.pickup_type = PickupWeapon.PickupType.MEDKIT
+		
+	parent_node.add_child(pickup)
+	if is_inside_tree() and pickup.is_inside_tree():
+		pickup.global_position = global_position + Vector3(0, 0.4, 0)
+	else:
+		pickup.position = position + Vector3(0, 0.4, 0)
 
 func _respawn() -> void:
 	var bm = get_tree().get_first_node_in_group("battle_manager")

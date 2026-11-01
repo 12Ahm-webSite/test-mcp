@@ -24,8 +24,20 @@ extends Control
 @onready var end_subtitle: Label = $EndScreen/VBox/Subtitle
 @onready var btn_restart: Button = $EndScreen/VBox/HBox/BtnRestart
 @onready var btn_menu: Button = $EndScreen/VBox/HBox/BtnMenu
+@onready var crosshair_label: Label = $Crosshair/Label if has_node("Crosshair/Label") else null
 
 var _alert_tween: Tween = null
+
+func _process(_delta: float) -> void:
+	if crosshair_label:
+		var player = get_tree().get_first_node_in_group("player")
+		if player and "is_aiming" in player:
+			if player.is_aiming:
+				crosshair_label.text = "•"
+				crosshair_label.modulate = Color(0.2, 1.0, 0.7, 0.95)
+			else:
+				crosshair_label.text = "+"
+				crosshair_label.modulate = Color(1.0, 1.0, 1.0, 0.75)
 
 func _ready() -> void:
 	if alert_banner:
@@ -38,27 +50,47 @@ func _ready() -> void:
 	if btn_menu:
 		btn_menu.pressed.connect(_on_menu_pressed)
 		
-	_connect_signals()
+	call_deferred("_connect_signals")
 
 func _connect_signals() -> void:
-	var bm = get_tree().get_first_node_in_group("battle_manager")
-	if bm:
-		bm.scores_updated.connect(_on_scores_updated)
-		bm.kill_feed_announced.connect(_on_killfeed_event)
-		bm.quota_updated.connect(_on_quota_updated)
-		bm.alliance_announced.connect(_on_alliance_event)
-		bm.battle_ended.connect(_on_battle_ended)
+	var tree := get_tree() if is_inside_tree() else null
+	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
+	if not bm:
+		bm = get_parent()
+	if not bm:
+		bm = owner
 		
-	var player = get_tree().get_first_node_in_group("player")
+	if bm:
+		if not bm.scores_updated.is_connected(_on_scores_updated):
+			bm.scores_updated.connect(_on_scores_updated)
+		if not bm.kill_feed_announced.is_connected(_on_killfeed_event):
+			bm.kill_feed_announced.connect(_on_killfeed_event)
+		if not bm.quota_updated.is_connected(_on_quota_updated):
+			bm.quota_updated.connect(_on_quota_updated)
+		if not bm.alliance_announced.is_connected(_on_alliance_event):
+			bm.alliance_announced.connect(_on_alliance_event)
+		if not bm.battle_ended.is_connected(_on_battle_ended):
+			bm.battle_ended.connect(_on_battle_ended)
+			
+		# Immediate sync
+		_on_quota_updated(bm.scores.get("Unit-07", 0), bm.kill_quota, bm.sector_title)
+		_on_scores_updated(bm.scores, bm.leader_name, bm.leader_score)
+		
+	var player = tree.get_first_node_in_group("player") if tree else null
 	if player:
-		player.health_changed.connect(_on_health_changed)
-		player.shield_changed.connect(_on_shield_changed)
-		player.weapon_swapped.connect(_on_weapon_swapped)
-		player.ammo_updated.connect(_on_ammo_updated)
+		if not player.health_changed.is_connected(_on_health_changed):
+			player.health_changed.connect(_on_health_changed)
+		if not player.shield_changed.is_connected(_on_shield_changed):
+			player.shield_changed.connect(_on_shield_changed)
+		if not player.weapon_swapped.is_connected(_on_weapon_swapped):
+			player.weapon_swapped.connect(_on_weapon_swapped)
+		if not player.ammo_updated.is_connected(_on_ammo_updated):
+			player.ammo_updated.connect(_on_ammo_updated)
 		
 		# Initial state sync
 		_on_health_changed(player.health, player.max_health)
 		_on_weapon_swapped(player.current_weapon, WeaponData.get_weapon(player.current_weapon))
+		_on_ammo_updated(player.current_weapon, player.ammo.get(player.current_weapon, 0))
 
 func _on_health_changed(current: float, max_hp: float) -> void:
 	if health_bar:
@@ -100,7 +132,8 @@ func _on_quota_updated(player_kills: int, quota: int, s_title: String) -> void:
 	if sector_title_label:
 		sector_title_label.text = s_title
 	if quota_label:
-		quota_label.text = "YOUR KILLS: %d / %d" % [player_kills, quota]
+		quota_label.text = "🎯 YOUR KILLS: %d / %d" % [player_kills, quota]
+		quota_label.modulate = Color(0.3, 1.0, 0.5) if player_kills >= quota else Color(0.9, 0.95, 1.0)
 
 func _on_scores_updated(_scores: Dictionary, l_name: String, l_score: int) -> void:
 	if leader_label:

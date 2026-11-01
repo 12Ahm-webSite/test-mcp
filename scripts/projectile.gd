@@ -98,8 +98,8 @@ func _on_area_entered(area: Area3D) -> void:
 
 func _explode() -> void:
 	set_physics_process(false)
-	monitoring = false
-	monitorable = false
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	
 	# Audio
 	var audio = get_tree().get_first_node_in_group("audio_manager")

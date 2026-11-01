@@ -13,6 +13,47 @@ signal battle_ended(player_won: bool, winner_name: String)
 @export var next_sector_scene: String = "res://scenes/levels/battle_2_canyon.tscn"
 @export var is_championship_final: bool = false
 
+enum Difficulty {
+	EASY,
+	MEDIUM,
+	HARD
+}
+@export var difficulty: Difficulty = Difficulty.EASY
+
+func get_difficulty_params() -> Dictionary:
+	match difficulty:
+		Difficulty.EASY:
+			return {
+				"bot_damage": 7.0,
+				"bot_accuracy": 0.45,
+				"bot_reaction_delay": 0.8,
+				"bot_max_health": 65.0,
+				"bot_walk_speed": 3.0,
+				"bot_run_speed": 4.5,
+				"kill_quota": kill_quota
+			}
+		Difficulty.MEDIUM:
+			return {
+				"bot_damage": 12.0,
+				"bot_accuracy": 0.65,
+				"bot_reaction_delay": 0.5,
+				"bot_max_health": 85.0,
+				"bot_walk_speed": 3.6,
+				"bot_run_speed": 5.5,
+				"kill_quota": kill_quota
+			}
+		Difficulty.HARD:
+			return {
+				"bot_damage": 18.0,
+				"bot_accuracy": 0.80,
+				"bot_reaction_delay": 0.3,
+				"bot_max_health": 100.0,
+				"bot_walk_speed": 4.2,
+				"bot_run_speed": 6.5,
+				"kill_quota": kill_quota
+			}
+	return {}
+
 var scores: Dictionary = {}
 var leader_name: String = ""
 var leader_score: int = 0
@@ -95,17 +136,15 @@ func _start_match() -> void:
 	is_match_starting = false
 
 func _on_player_died(killer: Node3D) -> void:
-	# Respawn player after 2.5s
-	await get_tree().create_timer(2.5).timeout
-	if is_battle_over:
-		return
+	# Continuous player respawn (fast 1.8s timer)
+	await get_tree().create_timer(1.8).timeout
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("respawn_at"):
 		var safe_sp := get_safe_spawn_point()
 		player.respawn_at(safe_sp)
 
 func record_elimination(killer: Node3D, victim: Node3D) -> void:
-	if is_battle_over:
+	if is_battle_over and not portal_active:
 		return
 		
 	var killer_str := _resolve_name(killer)
@@ -135,7 +174,7 @@ func record_elimination(killer: Node3D, victim: Node3D) -> void:
 	scores_updated.emit(scores, leader_name, leader_score)
 	
 	# Check for Quota Achievement
-	if scores.get(killer_str, 0) >= kill_quota:
+	if scores.get(killer_str, 0) >= kill_quota and not is_battle_over:
 		_on_quota_reached(killer_str)
 
 func _refresh_leader() -> void:
@@ -234,7 +273,7 @@ func _on_quota_reached(winner_str: String) -> void:
 			portal_active = true
 			if audio_mgr and audio_mgr.has_method("play_portal_open"):
 				audio_mgr.play_portal_open()
-			var msg := "🌀 EXTRACTION PORTAL UNLOCKED! Step into the portal to proceed!"
+			var msg := "🎉 SECTOR COMPLETE! 🌀 EXTRACTION PORTAL UNLOCKED! (GO TO PORTAL BEACON)"
 			alliance_announced.emit(msg, true)
 		else:
 			# Fallback if arena doesn't have a portal

@@ -67,7 +67,7 @@ size = Vector3(2, 8, 64)
 material = ExtResource("3_wall")
 size = Vector3(2, 8, 64)
 
-[node name="Battle3Caverns" type="Node3D"]
+[node name="Battle3Caverns" type="Node3D" groups=["battle_manager"]]
 script = ExtResource("1_bm")
 sector_id = "battle_3"
 sector_title = "Sector 3: Neon Caverns (Championship Final)"
