@@ -17,6 +17,8 @@ var scores: Dictionary = {}
 var leader_name: String = ""
 var leader_score: int = 0
 var is_battle_over: bool = false
+var is_match_starting: bool = true
+var portal_active: bool = false
 var spawn_points: Array[Vector3] = []
 var waypoints: Array[Vector3] = []
 
@@ -79,6 +81,18 @@ func _start_match() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_signal("player_eliminated"):
 		player.player_eliminated.connect(func(killer): _on_player_died(killer))
+
+	# 3-second match start countdown
+	is_match_starting = true
+	alliance_announced.emit("⏳ MATCH STARTING IN 3...", true)
+	if is_inside_tree() and get_tree():
+		await get_tree().create_timer(1.0).timeout
+		alliance_announced.emit("⏳ MATCH STARTING IN 2...", true)
+		await get_tree().create_timer(1.0).timeout
+		alliance_announced.emit("⏳ MATCH STARTING IN 1...", true)
+		await get_tree().create_timer(1.0).timeout
+		alliance_announced.emit("🔥 FIGHT! REACH %d KILLS TO UNLOCK EXTRACTION!" % kill_quota, true)
+	is_match_starting = false
 
 func _on_player_died(killer: Node3D) -> void:
 	# Respawn player after 2.5s
@@ -205,21 +219,46 @@ func _resolve_name(node: Node3D) -> String:
 	return node.name
 
 func _on_quota_reached(winner_str: String) -> void:
-	is_battle_over = true
 	var player_won := (winner_str == "Unit-07")
 	
 	if is_championship_final:
+		is_battle_over = true
 		battle_ended.emit(player_won, winner_str)
-	else:
-		# Transition to next sector after 3 seconds
-		var msg := "🏆 %s REACHED %d KILLS! Advancing to next Sector..." % [winner_str, kill_quota]
-		alliance_announced.emit(msg, player_won)
+		return
 		
-		if is_inside_tree() and get_tree():
-			await get_tree().create_timer(3.0).timeout
-			if not next_sector_scene.is_empty():
-				get_tree().change_scene_to_file(next_sector_scene)
-			else:
-				battle_ended.emit(player_won, winner_str)
+	if player_won:
+		# Player reached quota! Activate Extraction Portal
+		var portal = get_tree().get_first_node_in_group("portal")
+		if portal and portal.has_method("activate"):
+			portal.activate()
+			portal_active = true
+			if audio_mgr and audio_mgr.has_method("play_portal_open"):
+				audio_mgr.play_portal_open()
+			var msg := "🌀 EXTRACTION PORTAL UNLOCKED! Step into the portal to proceed!"
+			alliance_announced.emit(msg, true)
 		else:
-			battle_ended.emit(player_won, winner_str)
+			# Fallback if arena doesn't have a portal
+			is_battle_over = true
+			if is_inside_tree() and get_tree():
+				await get_tree().create_timer(3.0).timeout
+				if not next_sector_scene.is_empty():
+					get_tree().change_scene_to_file(next_sector_scene)
+				else:
+					battle_ended.emit(true, winner_str)
+	else:
+		# Bot reached quota before player -> defeat!
+		is_battle_over = true
+		battle_ended.emit(false, winner_str)
+
+func on_portal_reached() -> void:
+	if not portal_active or is_battle_over:
+		return
+	is_battle_over = true
+	var audio = get_tree().get_first_node_in_group("audio_manager")
+	if audio and audio.has_method("play_victory"):
+		audio.play_victory()
+		
+	if not next_sector_scene.is_empty():
+		get_tree().change_scene_to_file(next_sector_scene)
+	else:
+		battle_ended.emit(true, "Unit-07")

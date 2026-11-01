@@ -38,23 +38,26 @@ signal player_respawned()
 var is_active: bool = true
 
 # Node references
-@onready var model: Node3D = $Model
-@onready var arm_l_pivot: Node3D = $Model/ArmL_Pivot
-@onready var arm_r_pivot: Node3D = $Model/ArmR_Pivot
-@onready var leg_l_pivot: Node3D = $Model/LegL_Pivot
-@onready var leg_r_pivot: Node3D = $Model/LegR_Pivot
-@onready var shield_bubble: MeshInstance3D = $Model/ShieldBubble
-@onready var camera_pivot: Node3D = $CameraPivot
-@onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
-@onready var camera: Camera3D = $CameraPivot/SpringArm3D/Camera3D
+@onready var model: Node3D = $Model if has_node("Model") else null
+@onready var arm_l_pivot: Node3D = $Model/ArmL_Pivot if has_node("Model/ArmL_Pivot") else null
+@onready var arm_r_pivot: Node3D = $Model/ArmR_Pivot if has_node("Model/ArmR_Pivot") else null
+@onready var leg_l_pivot: Node3D = $Model/LegL_Pivot if has_node("Model/LegL_Pivot") else null
+@onready var leg_r_pivot: Node3D = $Model/LegR_Pivot if has_node("Model/LegR_Pivot") else null
+@onready var shield_bubble: MeshInstance3D = $Model/ShieldBubble if has_node("Model/ShieldBubble") else null
 
-# Weapon Socket & Models
-@onready var weapon_socket: Node3D = $Model/WeaponSocket if has_node("Model/WeaponSocket") else null
-@onready var pistol_model: Node3D = $Model/WeaponSocket/PistolModel if has_node("Model/WeaponSocket/PistolModel") else null
-@onready var smg_model: Node3D = $Model/WeaponSocket/SMGModel if has_node("Model/WeaponSocket/SMGModel") else null
-@onready var grenade_model: Node3D = $Model/WeaponSocket/GrenadeModel if has_node("Model/WeaponSocket/GrenadeModel") else null
-@onready var muzzle_point: Node3D = $Model/WeaponSocket/MuzzlePoint if has_node("Model/WeaponSocket/MuzzlePoint") else null
-@onready var muzzle_flash: OmniLight3D = $Model/WeaponSocket/MuzzlePoint/MuzzleFlash if has_node("Model/WeaponSocket/MuzzlePoint/MuzzleFlash") else null
+# First Person / Camera references
+@onready var head: Node3D = $Head if has_node("Head") else null
+@onready var camera: Camera3D = $Head/Camera3D if has_node("Head/Camera3D") else ($CameraPivot/SpringArm3D/Camera3D if has_node("CameraPivot/SpringArm3D/Camera3D") else null)
+@onready var camera_pivot: Node3D = $CameraPivot if has_node("CameraPivot") else null
+@onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D if has_node("CameraPivot/SpringArm3D") else null
+
+# Weapon Socket & Models (FPS viewmodel under camera prioritized)
+@onready var weapon_socket: Node3D = $Head/Camera3D/FpsWeaponSocket if has_node("Head/Camera3D/FpsWeaponSocket") else ($Model/WeaponSocket if has_node("Model/WeaponSocket") else null)
+@onready var pistol_model: Node3D = weapon_socket.get_node("PistolModel") if weapon_socket and weapon_socket.has_node("PistolModel") else null
+@onready var smg_model: Node3D = weapon_socket.get_node("SMGModel") if weapon_socket and weapon_socket.has_node("SMGModel") else null
+@onready var grenade_model: Node3D = weapon_socket.get_node("GrenadeModel") if weapon_socket and weapon_socket.has_node("GrenadeModel") else null
+@onready var muzzle_point: Node3D = weapon_socket.get_node("MuzzlePoint") if weapon_socket and weapon_socket.has_node("MuzzlePoint") else null
+@onready var muzzle_flash: OmniLight3D = muzzle_point.get_node("MuzzleFlash") if muzzle_point and muzzle_point.has_node("MuzzleFlash") else null
 
 const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
 
@@ -71,6 +74,8 @@ var ammo: Dictionary = {
 }
 var _fire_timer: float = 0.0
 var _recoil_offset: float = 0.0
+var _step_bob_time: float = 0.0
+var _is_first_person: bool = true
 
 # Camera state
 var _camera_yaw: float = 0.0
@@ -100,7 +105,12 @@ func _ready() -> void:
 	add_to_group("player")
 	_setup_input_map()
 	
-	if camera_pivot:
+	if head:
+		_is_first_person = true
+		if model:
+			model.visible = false # Hide 3rd-person body in First Person view
+	elif camera_pivot:
+		_is_first_person = false
 		camera_pivot.top_level = true
 		camera_pivot.global_position = global_position + Vector3(0, 1.4, 0)
 		camera_pivot.rotation.y = _camera_yaw
@@ -160,9 +170,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Mouse look rotation
 	var is_captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or DisplayServer.get_name() == "headless"
 	if is_captured and event is InputEventMouseMotion:
-		_camera_yaw -= event.relative.x * mouse_sensitivity
-		_camera_pitch -= event.relative.y * mouse_sensitivity
-		_camera_pitch = clamp(_camera_pitch, min_pitch, max_pitch)
+		if _is_first_person:
+			rotate_y(-event.relative.x * mouse_sensitivity)
+			_camera_pitch = clamp(_camera_pitch - event.relative.y * mouse_sensitivity, deg_to_rad(-85.0), deg_to_rad(85.0))
+			if head:
+				head.rotation.x = _camera_pitch
+		else:
+			_camera_yaw -= event.relative.x * mouse_sensitivity
+			_camera_pitch -= event.relative.y * mouse_sensitivity
+			_camera_pitch = clamp(_camera_pitch, min_pitch, max_pitch)
 
 	# Weapon selection (1, 2, 3)
 	if event is InputEventKey and event.pressed:
@@ -189,9 +205,21 @@ func _physics_process(delta: float) -> void:
 	# Fire cooldown & weapon recoil recovery
 	if _fire_timer > 0.0:
 		_fire_timer -= delta
-	_recoil_offset = lerp(_recoil_offset, 0.0, 16.0 * delta)
+	_recoil_offset = lerp(_recoil_offset, 0.0, 14.0 * delta)
 	if weapon_socket:
-		weapon_socket.position.z = -0.32 + _recoil_offset
+		if _is_first_person:
+			var h_speed := Vector2(velocity.x, velocity.z).length()
+			if is_on_floor() and h_speed > 0.5:
+				_step_bob_time += delta * 10.0 * clamp(h_speed / walk_speed, 0.8, 1.8)
+				var bob_x: float = cos(_step_bob_time * 0.5) * 0.012
+				var bob_y: float = absf(sin(_step_bob_time)) * 0.015
+				weapon_socket.position = Vector3(0.24 + bob_x, -0.20 + bob_y, -0.42 + _recoil_offset)
+			else:
+				_step_bob_time += delta * 2.0
+				var breath_y: float = sin(_step_bob_time) * 0.004
+				weapon_socket.position = Vector3(0.24, -0.20 + breath_y, -0.42 + _recoil_offset)
+		else:
+			weapon_socket.position.z = -0.32 + _recoil_offset
 
 	# Continuous automatic firing
 	if is_active and not is_dead and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
@@ -247,9 +275,17 @@ func _physics_process(delta: float) -> void:
 	# Get input vector
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 
-	# Movement relative to camera
+	# Movement relative to camera / body
 	var move_dir := Vector3.ZERO
-	if camera_pivot != null:
+	if _is_first_person:
+		var forward := -global_transform.basis.z
+		forward.y = 0.0
+		forward = forward.normalized()
+		var right := global_transform.basis.x
+		right.y = 0.0
+		right = right.normalized()
+		move_dir = (right * input_dir.x - forward * input_dir.y).normalized()
+	elif camera_pivot != null:
 		var cam_forward := -camera_pivot.global_transform.basis.z
 		cam_forward.y = 0.0
 		cam_forward = cam_forward.normalized()
@@ -275,9 +311,10 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, move_dir.x * target_speed, acceleration * delta)
 		velocity.z = move_toward(velocity.z, move_dir.z * target_speed, acceleration * delta)
 		
-		# Smooth model rotation toward movement direction
-		var target_rot := atan2(-move_dir.x, -move_dir.z)
-		model.rotation.y = lerp_angle(model.rotation.y, target_rot, rotation_speed * delta)
+		# Smooth model rotation toward movement direction (only in 3rd person)
+		if not _is_first_person and model:
+			var target_rot := atan2(-move_dir.x, -move_dir.z)
+			model.rotation.y = lerp_angle(model.rotation.y, target_rot, rotation_speed * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 		velocity.z = move_toward(velocity.z, 0.0, friction * delta)
@@ -301,6 +338,10 @@ func _start_dash(move_dir: Vector3) -> void:
 	
 	if move_dir.length() > 0.1:
 		_dash_direction = move_dir.normalized()
+	elif _is_first_person:
+		var fwd := -global_transform.basis.z
+		fwd.y = 0.0
+		_dash_direction = fwd.normalized()
 	elif camera_pivot != null:
 		var fwd := -camera_pivot.global_transform.basis.z
 		fwd.y = 0.0
@@ -313,8 +354,9 @@ func _start_dash(move_dir: Vector3) -> void:
 	velocity.z = _dash_direction.z * dash_speed
 	velocity.y = 0.0
 	
-	# Instantly face dash direction
-	model.rotation.y = atan2(-_dash_direction.x, -_dash_direction.z)
+	# Instantly face dash direction (only in 3rd person)
+	if not _is_first_person and model:
+		model.rotation.y = atan2(-_dash_direction.x, -_dash_direction.z)
 	add_camera_shake(0.35)
 	
 	var audio = get_tree().get_first_node_in_group("audio_manager")
@@ -501,7 +543,7 @@ func try_shoot() -> bool:
 			select_weapon(WeaponData.WeaponType.PISTOL)
 			
 	# Recoil kick
-	_recoil_offset = 0.08
+	_recoil_offset = 0.06
 	
 	# Muzzle flash
 	if muzzle_flash:
@@ -515,8 +557,8 @@ func try_shoot() -> bool:
 		audio.call(sfx_name)
 		
 	# Origin & direction calculation
-	var origin: Vector3 = muzzle_point.global_position if muzzle_point else global_position + Vector3(0, 1.2, -0.5)
-	var shoot_dir: Vector3 = -model.global_transform.basis.z
+	var origin: Vector3 = muzzle_point.global_position if muzzle_point else global_position + Vector3(0, 1.4, -0.5)
+	var shoot_dir: Vector3 = -global_transform.basis.z
 	
 	if camera:
 		var cam_pos: Vector3 = camera.global_position

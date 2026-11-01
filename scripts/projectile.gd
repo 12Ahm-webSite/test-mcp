@@ -14,6 +14,7 @@ var velocity: Vector3 = Vector3.ZERO
 var _lifetime: float = 0.0
 
 @onready var visual_mesh: MeshInstance3D = $MeshInstance3D
+@onready var grenade_mesh: MeshInstance3D = $GrenadeMesh
 @onready var light: OmniLight3D = $OmniLight3D
 
 func _ready() -> void:
@@ -33,16 +34,26 @@ func setup(p_shooter: Node3D, p_direction: Vector3, p_weapon: Dictionary) -> voi
 	
 	velocity = p_direction.normalized() * speed
 	if is_inside_tree() and p_direction.length_squared() > 0.001:
-		look_at(global_position + p_direction, Vector3.UP)
+		var dir := p_direction.normalized()
+		var up := Vector3.RIGHT if absf(dir.dot(Vector3.UP)) > 0.98 else Vector3.UP
+		look_at(global_position + dir, up)
 	
 	if is_explosive:
+		if visual_mesh:
+			visual_mesh.visible = false
+		if grenade_mesh:
+			grenade_mesh.visible = true
 		if light:
 			light.light_color = Color(1.0, 0.4, 0.1)
-			light.omni_range = 3.0
+			light.omni_range = 3.5
 	else:
+		if visual_mesh:
+			visual_mesh.visible = true
+		if grenade_mesh:
+			grenade_mesh.visible = false
 		if light:
 			light.light_color = Color(1.0, 0.9, 0.3)
-			light.omni_range = 1.8
+			light.omni_range = 2.5
 
 func _physics_process(delta: float) -> void:
 	_lifetime += delta
@@ -57,8 +68,10 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= 19.6 * gravity_scale * delta
 		
 	global_position += velocity * delta
-	if velocity.length_squared() > 0.01:
-		look_at(global_position + velocity.normalized(), Vector3.UP)
+	if is_inside_tree() and velocity.length_squared() > 0.01:
+		var dir := velocity.normalized()
+		var up := Vector3.RIGHT if absf(dir.dot(Vector3.UP)) > 0.98 else Vector3.UP
+		look_at(global_position + dir, up)
 
 func _on_body_entered(body: Node3D) -> void:
 	if body == shooter:

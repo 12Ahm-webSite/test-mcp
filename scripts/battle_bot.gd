@@ -16,10 +16,10 @@ enum State {
 @export var character_name: String = "Bot-Alpha"
 @export var bot_id: int = 1
 @export var max_health: float = 100.0
-@export var walk_speed: float = 5.2
-@export var run_speed: float = 7.5
+@export var walk_speed: float = 3.6
+@export var run_speed: float = 5.5
 @export var attack_range: float = 18.0
-@export var fire_accuracy: float = 0.85
+@export var fire_accuracy: float = 0.72
 
 var health: float = 100.0
 var state: State = State.ROAM_HUNT
@@ -27,6 +27,7 @@ var is_allied_with_player: bool = false
 var ally_partner: Node3D = null
 var current_target: Node3D = null
 var is_dead: bool = false
+var _reaction_timer: float = 0.5
 
 # Weapon & Combat
 const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
@@ -224,7 +225,13 @@ func _process_engage(delta: float) -> void:
 	_apply_movement_with_avoidance(move_vec.normalized(), walk_speed, delta)
 	
 	# Attack if in range and line of sight is clear
-	if dist <= attack_range and _has_line_of_sight(current_target):
+	var bm = get_tree().get_first_node_in_group("battle_manager")
+	if bm and "is_match_starting" in bm and bm.is_match_starting:
+		return
+		
+	if _reaction_timer > 0.0:
+		_reaction_timer -= delta
+	elif dist <= attack_range and _has_line_of_sight(current_target):
 		_try_bot_shoot(target_pos)
 
 func _move_towards(target_pt: Vector3, speed: float, delta: float) -> void:

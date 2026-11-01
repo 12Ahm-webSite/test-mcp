@@ -10,10 +10,12 @@ var is_active: bool = false
 @onready var beacon_light: OmniLight3D = $BeaconLight
 @onready var sky_beam: SpotLight3D = $SkyBeam
 @onready var particles: GPUParticles3D = $PortalParticles
+@onready var portal_label: Label3D = $PortalLabel if has_node("PortalLabel") else null
 
 var _time: float = 0.0
 
 func _ready() -> void:
+	add_to_group("portal")
 	if area:
 		area.body_entered.connect(_on_body_entered)
 		area.monitoring = false
@@ -25,6 +27,9 @@ func _ready() -> void:
 		sky_beam.visible = false
 	if particles:
 		particles.emitting = false
+	if portal_label:
+		portal_label.text = "[ 🔒 EXTRACTION PORTAL: LOCKED ]"
+		portal_label.modulate = Color(0.7, 0.7, 0.8, 0.6)
 
 func _process(delta: float) -> void:
 	if not is_active:
@@ -52,6 +57,9 @@ func activate() -> void:
 		sky_beam.light_energy = 8.0
 	if particles:
 		particles.emitting = true
+	if portal_label:
+		portal_label.text = "[ 🌀 EXTRACTION PORTAL ACTIVE - ENTER TO ADVANCE ]"
+		portal_label.modulate = Color(0.2, 1.0, 0.85)
 		
 	# Trigger nice flare animation
 	var tween := create_tween()
@@ -65,3 +73,6 @@ func _on_body_entered(body: Node3D) -> void:
 		var gm = get_tree().get_first_node_in_group("game_manager")
 		if gm and gm.has_method("on_portal_reached"):
 			gm.on_portal_reached()
+		var bm = get_tree().get_first_node_in_group("battle_manager")
+		if bm and bm.has_method("on_portal_reached"):
+			bm.on_portal_reached()

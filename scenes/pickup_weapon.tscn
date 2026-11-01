@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/pickup_weapon.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/MGP7/MGP7_Rigged.glb" id="2_smg"]
@@ -7,6 +7,30 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
 radius = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_beacon"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.85, 1, 0.38)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_beacon"]
+material = SubResource("StandardMaterial3D_beacon")
+top_radius = 0.08
+bottom_radius = 0.16
+height = 24.0
+radial_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.85, 1, 0.65)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ring"]
+material = SubResource("StandardMaterial3D_ring")
+top_radius = 0.65
+bottom_radius = 0.65
+height = 0.04
+radial_segments = 16
 
 [node name="PickupWeapon" type="Area3D"]
 collision_layer = 16
@@ -27,7 +51,23 @@ visible = false
 transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, 0, 0, 0)
 visible = false
 
+[node name="BeaconBeam" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+mesh = SubResource("CylinderMesh_beacon")
+
+[node name="GroundRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_ring")
+
+[node name="BillboardLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
+billboard = 1
+text = "[ 💥 MGP7 RAPID SMG ]"
+font_size = 28
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 light_color = Color(0.2, 0.7, 1, 1)
-light_energy = 1.2
-omni_range = 2.4
+light_energy = 2.0
+omni_range = 3.5

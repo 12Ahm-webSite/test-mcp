@@ -72,3 +72,4 @@ const WEAPONS := {
 
 static func get_weapon(type: WeaponType) -> Dictionary:
 	return WEAPONS.get(type, WEAPONS[WeaponType.PISTOL])
+

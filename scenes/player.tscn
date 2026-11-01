@@ -116,38 +116,32 @@ mesh = SubResource("CylinderMesh_leg")
 visible = false
 mesh = SubResource("SphereMesh_shield")
 
-[node name="WeaponSocket" type="Node3D" parent="Model"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.08, -0.32)
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
 
-[node name="PistolModel" parent="Model/WeaponSocket" instance=ExtResource("4_pistol")]
-transform = Transform3D(0.38, 0, 0, 0, 0.38, 0, 0, 0, 0.38, 0, 0, 0)
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = true
+fov = 75.0
 
-[node name="SMGModel" parent="Model/WeaponSocket" instance=ExtResource("5_smg")]
-transform = Transform3D(0.32, 0, 0, 0, 0.32, 0, 0, 0, 0.32, 0, 0, 0)
+[node name="FpsWeaponSocket" type="Node3D" parent="Head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, -0.2, -0.42)
+
+[node name="PistolModel" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("4_pistol")]
+transform = Transform3D(-5.24537e-10, 0, 0.012, 0, 0.012, 0, -0.012, 0, -5.24537e-10, 0, 0, 0)
+
+[node name="SMGModel" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("5_smg")]
+transform = Transform3D(-3.27835e-08, 0, 0.75, 0, 0.75, 0, -0.75, 0, -3.27835e-08, 0, 0, 0)
 visible = false
 
-[node name="GrenadeModel" parent="Model/WeaponSocket" instance=ExtResource("6_grenade")]
-transform = Transform3D(0.42, 0, 0, 0, 0.42, 0, 0, 0, 0.42, 0, 0, 0)
+[node name="GrenadeModel" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("6_grenade")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 0)
 visible = false
 
-[node name="MuzzlePoint" type="Node3D" parent="Model/WeaponSocket"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.42)
+[node name="MuzzlePoint" type="Node3D" parent="Head/Camera3D/FpsWeaponSocket"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -0.35)
 
-[node name="MuzzleFlash" type="OmniLight3D" parent="Model/WeaponSocket/MuzzlePoint"]
+[node name="MuzzleFlash" type="OmniLight3D" parent="Head/Camera3D/FpsWeaponSocket/MuzzlePoint"]
 visible = false
 light_color = Color(1, 0.85, 0.3, 1)
-light_energy = 2.5
-omni_range = 3.0
-
-[node name="CameraPivot" type="Node3D" parent="."]
-top_level = true
-
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]
-transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0, 0)
-collision_mask = 1
-spring_length = 5.0
-margin = 0.2
-
-[node name="Camera3D" type="Camera3D" parent="CameraPivot/SpringArm3D"]
-current = true
-fov = 70.0
+light_energy = 3.0
+omni_range = 3.5

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle_manager.gd" id="1_bm"]
 [ext_resource type="Material" path="res://assets/materials/mat_grass.tres" id="2_grass"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/grass.glb" id="14_grass_model"]
 [ext_resource type="PackedScene" path="res://ui/battle_hud.tscn" id="15_hud"]
 [ext_resource type="PackedScene" path="res://scenes/vfx_ambient_motes.tscn" id="16_motes"]
+[ext_resource type="PackedScene" path="res://scenes/portal.tscn" id="17_portal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.28, 0.6, 0.95, 1)
@@ -285,3 +286,7 @@ crystal_type = 2
 [node name="BattleHUD" parent="." instance=ExtResource("15_hud")]
 
 [node name="AmbientMotes" parent="." instance=ExtResource("16_motes")]
+
+[node name="Portal" parent="." instance=ExtResource("17_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -21)
+

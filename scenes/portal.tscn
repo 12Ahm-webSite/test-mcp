@@ -51,7 +51,7 @@ scale_max = 0.15
 material = SubResource("StandardMaterial3D_core")
 size = Vector3(0.1, 0.1, 0.1)
 
-[node name="Portal" type="Node3D"]
+[node name="Portal" type="Node3D" groups=["portal"]]
 script = ExtResource("1_script")
 
 [node name="Model" type="Node3D" parent="."]
@@ -104,3 +104,11 @@ amount = 24
 lifetime = 1.2
 process_material = SubResource("ParticleProcessMaterial_swirl")
 draw_pass_1 = SubResource("BoxMesh_portal_part")
+
+[node name="PortalLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.4, 0)
+billboard = 1
+text = "[ 🔒 EXTRACTION PORTAL: LOCKED ]"
+font_size = 32
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)

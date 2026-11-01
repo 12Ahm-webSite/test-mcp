@@ -66,3 +66,4 @@ collision_mask = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 target_position = Vector3(1.4, 0, -2.2)
 collision_mask = 1
+

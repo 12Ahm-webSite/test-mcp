@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle_manager.gd" id="1_bm"]
 [ext_resource type="Material" path="res://assets/materials/mat_canyon_ground.tres" id="2_canyon"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/prop_rock.tscn" id="12_rock"]
 [ext_resource type="PackedScene" path="res://ui/battle_hud.tscn" id="13_hud"]
 [ext_resource type="PackedScene" path="res://scenes/vfx_ambient_motes.tscn" id="14_motes"]
+[ext_resource type="PackedScene" path="res://scenes/portal.tscn" id="15_portal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twilight"]
 sky_top_color = Color(0.2, 0.12, 0.38, 1)
@@ -295,3 +296,7 @@ crystal_type = 2
 [node name="BattleHUD" parent="." instance=ExtResource("13_hud")]
 
 [node name="AmbientMotes" parent="." instance=ExtResource("14_motes")]
+
+[node name="Portal" parent="." instance=ExtResource("15_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
