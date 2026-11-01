@@ -1,0 +1,297 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_manager.gd" id="1_bm"]
+[ext_resource type="Material" path="res://assets/materials/mat_canyon_ground.tres" id="2_canyon"]
+[ext_resource type="Material" path="res://assets/materials/mat_wall.tres" id="3_wall"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="4_player"]
+[ext_resource type="PackedScene" path="res://scenes/battle_bot.tscn" id="5_bot"]
+[ext_resource type="PackedScene" path="res://scenes/crystal.tscn" id="6_crystal"]
+[ext_resource type="PackedScene" path="res://scenes/prop_fuel_barrel.tscn" id="7_barrel"]
+[ext_resource type="PackedScene" path="res://scenes/pickup_weapon.tscn" id="8_pickup"]
+[ext_resource type="PackedScene" path="res://scenes/prop_ruins_arch.tscn" id="9_arch"]
+[ext_resource type="PackedScene" path="res://scenes/prop_tech_pillar.tscn" id="10_pillar"]
+[ext_resource type="PackedScene" path="res://scenes/prop_platform.tscn" id="11_platform"]
+[ext_resource type="PackedScene" path="res://scenes/prop_rock.tscn" id="12_rock"]
+[ext_resource type="PackedScene" path="res://ui/battle_hud.tscn" id="13_hud"]
+[ext_resource type="PackedScene" path="res://scenes/vfx_ambient_motes.tscn" id="14_motes"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twilight"]
+sky_top_color = Color(0.2, 0.12, 0.38, 1)
+sky_horizon_color = Color(0.88, 0.45, 0.24, 1)
+ground_bottom_color = Color(0.14, 0.09, 0.06, 1)
+ground_horizon_color = Color(0.5, 0.28, 0.18, 1)
+sun_angle_max = 35.0
+
+[sub_resource type="Sky" id="Sky_twilight"]
+sky_material = SubResource("ProceduralSkyMaterial_twilight")
+
+[sub_resource type="Environment" id="Environment_twilight"]
+background_mode = 2
+sky = SubResource("Sky_twilight")
+ambient_light_source = 2
+ambient_light_color = Color(0.65, 0.45, 0.4, 1)
+ambient_light_energy = 0.3
+tonemap_mode = 2
+tonemap_exposure = 1.0
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.2
+glow_enabled = false
+fog_enabled = true
+fog_light_color = Color(0.78, 0.42, 0.28, 1)
+fog_density = 0.003
+fog_sky_affect = 0.25
+adjustment_enabled = true
+adjustment_contrast = 1.05
+adjustment_saturation = 1.05
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(60, 1, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = ExtResource("2_canyon")
+size = Vector3(60, 1, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_ew"]
+size = Vector3(60, 6, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_ew"]
+material = ExtResource("3_wall")
+size = Vector3(60, 6, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_ns"]
+size = Vector3(2, 6, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_ns"]
+material = ExtResource("3_wall")
+size = Vector3(2, 6, 60)
+
+[node name="Battle2Canyon" type="Node3D"]
+script = ExtResource("1_bm")
+sector_id = "battle_2"
+sector_title = "Sector 2: Twilight Canyon"
+kill_quota = 7
+next_sector_scene = "res://scenes/levels/battle_3_caverns.tscn"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_twilight")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 20, 0)
+light_color = Color(1, 0.78, 0.6, 1)
+light_energy = 1.05
+shadow_enabled = true
+shadow_blur = 1.2
+directional_shadow_max_distance = 65.0
+
+[node name="Arena" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="WallNorth" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -30)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallNorth"]
+shape = SubResource("BoxShape3D_wall_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallNorth"]
+mesh = SubResource("BoxMesh_wall_ew")
+
+[node name="WallSouth" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 30)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallSouth"]
+shape = SubResource("BoxShape3D_wall_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallSouth"]
+mesh = SubResource("BoxMesh_wall_ew")
+
+[node name="WallWest" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallWest"]
+shape = SubResource("BoxShape3D_wall_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallWest"]
+mesh = SubResource("BoxMesh_wall_ns")
+
+[node name="WallEast" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallEast"]
+shape = SubResource("BoxShape3D_wall_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallEast"]
+mesh = SubResource("BoxMesh_wall_ns")
+
+[node name="Architecture" type="Node3D" parent="."]
+
+[node name="Arch1" parent="Architecture" instance=ExtResource("9_arch")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 8)
+
+[node name="Arch2" parent="Architecture" instance=ExtResource("9_arch")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, -8)
+
+[node name="Pillar1" parent="Architecture" instance=ExtResource("10_pillar")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -16, 0, 12)
+
+[node name="Pillar2" parent="Architecture" instance=ExtResource("10_pillar")]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 16, 0, 12)
+
+[node name="Pillar3" parent="Architecture" instance=ExtResource("10_pillar")]
+transform = Transform3D(1, 0, 0, 0, 1.4, 0, 0, 0, 1, -18, 0, -10)
+
+[node name="Pillar4" parent="Architecture" instance=ExtResource("10_pillar")]
+transform = Transform3D(1, 0, 0, 0, 1.4, 0, 0, 0, 1, 18, 0, -10)
+
+[node name="PlatStep1" parent="Architecture" instance=ExtResource("11_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.8, -2)
+
+[node name="PlatStep2" parent="Architecture" instance=ExtResource("11_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.8, -4)
+
+[node name="PlatStep3" parent="Architecture" instance=ExtResource("11_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.8, -4)
+
+[node name="PlatStep4" parent="Architecture" instance=ExtResource("11_platform")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.8, -2)
+
+[node name="PlatHighCenter" parent="Architecture" instance=ExtResource("11_platform")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 2.6, -14)
+
+[node name="Boulders" type="Node3D" parent="."]
+
+[node name="Rock1" parent="Boulders" instance=ExtResource("12_rock")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -15, 0, -22)
+
+[node name="Rock2" parent="Boulders" instance=ExtResource("12_rock")]
+transform = Transform3D(2.5, 0, 0, 0, 2, 0, 0, 0, 2.5, 15, 0, -22)
+
+[node name="Rock3" parent="Boulders" instance=ExtResource("12_rock")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -20, 0, 5)
+
+[node name="Rock4" parent="Boulders" instance=ExtResource("12_rock")]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 20, 0, 5)
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnPoint1" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 20)
+
+[node name="SpawnPoint2" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, 16)
+
+[node name="SpawnPoint3" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 16)
+
+[node name="SpawnPoint4" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, -6)
+
+[node name="SpawnPoint5" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, -6)
+
+[node name="SpawnPoint6" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.5, -20)
+
+[node name="SpawnPoint7" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.5, -20)
+
+[node name="SpawnPoint8" type="Node3D" parent="SpawnPoints" groups=["spawn_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -20)
+
+[node name="Combatants" type="Node3D" parent="."]
+
+[node name="Player" parent="Combatants" instance=ExtResource("4_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 20)
+
+[node name="BotAlpha" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, 16)
+character_name = "Bot-Alpha"
+bot_id = 1
+
+[node name="BotBravo" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 16)
+character_name = "Bot-Bravo"
+bot_id = 2
+
+[node name="BotCharlie" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, -6)
+character_name = "Bot-Charlie"
+bot_id = 3
+
+[node name="BotDelta" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, -6)
+character_name = "Bot-Delta"
+bot_id = 4
+
+[node name="BotEcho" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.5, -20)
+character_name = "Bot-Echo"
+bot_id = 5
+
+[node name="BotFoxtrot" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.5, -20)
+character_name = "Bot-Foxtrot"
+bot_id = 6
+
+[node name="BotGolf" parent="Combatants" instance=ExtResource("5_bot")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -20)
+character_name = "Bot-Golf"
+bot_id = 7
+
+[node name="Barrels" type="Node3D" parent="."]
+
+[node name="Barrel1" parent="Barrels" instance=ExtResource("7_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 6)
+
+[node name="Barrel2" parent="Barrels" instance=ExtResource("7_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
+
+[node name="Barrel3" parent="Barrels" instance=ExtResource("7_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+
+[node name="Barrel4" parent="Barrels" instance=ExtResource("7_barrel")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -8)
+
+[node name="Pickups" type="Node3D" parent="."]
+
+[node name="PickupSMG1" parent="Pickups" instance=ExtResource("8_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.5, 2)
+pickup_type = 0
+
+[node name="PickupSMG2" parent="Pickups" instance=ExtResource("8_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.5, 2)
+pickup_type = 0
+
+[node name="PickupGrenade1" parent="Pickups" instance=ExtResource("8_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, -14)
+pickup_type = 1
+
+[node name="PickupMedKit1" parent="Pickups" instance=ExtResource("8_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.5, 18)
+pickup_type = 2
+
+[node name="PickupMedKit2" parent="Pickups" instance=ExtResource("8_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.5, -18)
+pickup_type = 2
+
+[node name="PowerCrystals" type="Node3D" parent="."]
+
+[node name="SpeedCrystal" parent="PowerCrystals" instance=ExtResource("6_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, 0)
+crystal_type = 1
+
+[node name="ShieldCrystal" parent="PowerCrystals" instance=ExtResource("6_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, 0)
+crystal_type = 2
+
+[node name="BattleHUD" parent="." instance=ExtResource("13_hud")]
+
+[node name="AmbientMotes" parent="." instance=ExtResource("14_motes")]

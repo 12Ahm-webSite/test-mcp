@@ -1,0 +1,305 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_hud.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+bg_color = Color(0.1, 0.12, 0.16, 0.75)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.35, 0.4, 0.5)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
+bg_color = Color(0.08, 0.1, 0.14, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.6, 0.85, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp"]
+bg_color = Color(0.15, 0.85, 0.45, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="BattleHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Crosshair" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Crosshair"]
+layout_mode = 2
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomLeft" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+offset_right = 280.0
+grow_vertical = 0
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="BottomLeft"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ShieldLabel" type="Label" parent="BottomLeft/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "🛡️ KINETIC BARRIER ACTIVE"
+
+[node name="HealthBar" type="ProgressBar" parent="BottomLeft/VBox"]
+custom_minimum_size = Vector2(240, 24)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp")
+value = 100.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="BottomLeft/VBox/HealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 13
+text = "100 / 100 HP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomRight" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = -90.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="HBox" type="HBoxContainer" parent="BottomRight"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Slot1" type="PanelContainer" parent="BottomRight/HBox"]
+custom_minimum_size = Vector2(90, 60)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="VBox" type="VBoxContainer" parent="BottomRight/HBox/Slot1"]
+layout_mode = 2
+alignment = 1
+
+[node name="Name" type="Label" parent="BottomRight/HBox/Slot1/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "[1] PISTOL"
+horizontal_alignment = 1
+
+[node name="Ammo" type="Label" parent="BottomRight/HBox/Slot1/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "∞"
+horizontal_alignment = 1
+
+[node name="Slot2" type="PanelContainer" parent="BottomRight/HBox"]
+custom_minimum_size = Vector2(90, 60)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="VBox" type="VBoxContainer" parent="BottomRight/HBox/Slot2"]
+layout_mode = 2
+alignment = 1
+
+[node name="Name" type="Label" parent="BottomRight/HBox/Slot2/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "[2] SMG"
+horizontal_alignment = 1
+
+[node name="Ammo" type="Label" parent="BottomRight/HBox/Slot2/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "0"
+horizontal_alignment = 1
+
+[node name="Slot3" type="PanelContainer" parent="BottomRight/HBox"]
+custom_minimum_size = Vector2(90, 60)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="VBox" type="VBoxContainer" parent="BottomRight/HBox/Slot3"]
+layout_mode = 2
+alignment = 1
+
+[node name="Name" type="Label" parent="BottomRight/HBox/Slot3/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "[3] GRENADE"
+horizontal_alignment = 1
+
+[node name="Ammo" type="Label" parent="BottomRight/HBox/Slot3/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "0"
+horizontal_alignment = 1
+
+[node name="TopCenter" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -190.0
+offset_right = 190.0
+offset_bottom = 85.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 16
+
+[node name="Panel" type="PanelContainer" parent="TopCenter"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
+
+[node name="VBox" type="VBoxContainer" parent="TopCenter/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SectorTitle" type="Label" parent="TopCenter/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Sector 1: Sunken Ruins"
+horizontal_alignment = 1
+
+[node name="QuotaLabel" type="Label" parent="TopCenter/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "YOUR KILLS: 0 / 5"
+horizontal_alignment = 1
+
+[node name="LeaderLabel" type="Label" parent="TopCenter/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+text = "MATCH LEADER: None (0 Kills)"
+horizontal_alignment = 1
+
+[node name="TopRight" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_bottom = 180.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+
+[node name="KillfeedContainer" type="VBoxContainer" parent="TopRight"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CenterAlert" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 120.0
+offset_bottom = 160.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="AlertBanner" type="Label" parent="CenterAlert"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "🤝 Alliance Established"
+horizontal_alignment = 1
+
+[node name="EndScreen" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -120.0
+offset_right = 220.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
+
+[node name="VBox" type="VBoxContainer" parent="EndScreen"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="EndScreen/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "CHAMPIONSHIP VICTORY!"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="EndScreen/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "You eliminated all rivals and claimed the title."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="EndScreen/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="BtnRestart" type="Button" parent="EndScreen/VBox/HBox"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "PLAY AGAIN"
+
+[node name="BtnMenu" type="Button" parent="EndScreen/VBox/HBox"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+text = "MAIN MENU"

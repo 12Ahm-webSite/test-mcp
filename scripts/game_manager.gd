@@ -30,6 +30,8 @@ func _init_level() -> void:
 	energy_updated.emit(collected_energy_crystals, required_energy_crystals)
 	score_updated.emit(current_score)
 	toast_announced.emit("Objective: Collect %d Energy Crystals!" % required_energy_crystals)
+	if audio_mgr and audio_mgr.has_method("play_bgm_for_level"):
+		audio_mgr.play_bgm_for_level(level_id)
 
 func _process(delta: float) -> void:
 	if not is_game_over:
@@ -78,6 +80,9 @@ func on_portal_reached() -> void:
 		return
 	is_game_over = true
 	
+	if audio_mgr and audio_mgr.has_method("duck_bgm"):
+		audio_mgr.duck_bgm()
+	
 	# Stop entities
 	_freeze_actors()
 	
@@ -93,6 +98,8 @@ func trigger_game_over(won: bool) -> void:
 	if is_game_over:
 		return
 	is_game_over = true
+	if audio_mgr and audio_mgr.has_method("duck_bgm"):
+		audio_mgr.duck_bgm()
 	_freeze_actors()
 	game_ended.emit(won)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

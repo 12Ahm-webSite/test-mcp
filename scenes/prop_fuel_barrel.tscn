@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/prop_fuel_barrel.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Props/FuelBarrelV1.glb" id="2_intact"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Props/FuelBarrelV1_Destroyed.glb" id="3_destroyed"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_barrel"]
+height = 1.15
+radius = 0.42
+
+[node name="PropFuelBarrel" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 23
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.58, 0)
+shape = SubResource("CylinderShape3D_barrel")
+
+[node name="IntactModel" parent="." instance=ExtResource("2_intact")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="DestroyedModel" parent="." instance=ExtResource("3_destroyed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+visible = false

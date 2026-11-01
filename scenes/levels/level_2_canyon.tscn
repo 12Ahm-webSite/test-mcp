@@ -12,12 +12,15 @@
 [ext_resource type="PackedScene" path="res://scenes/prop_platform.tscn" id="10_platform"]
 [ext_resource type="PackedScene" path="res://scenes/prop_rock.tscn" id="11_rock"]
 [ext_resource type="PackedScene" path="res://ui/game_ui.tscn" id="12_ui"]
+[ext_resource type="PackedScene" path="res://scenes/vfx_ambient_motes.tscn" id="13_motes"]
+[ext_resource type="Material" path="res://assets/materials/mat_forcefield.tres" id="14_forcefield"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twilight"]
-sky_top_color = Color(0.2, 0.12, 0.35, 1)
-sky_horizon_color = Color(0.85, 0.42, 0.22, 1)
-ground_bottom_color = Color(0.12, 0.08, 0.06, 1)
-ground_horizon_color = Color(0.45, 0.25, 0.18, 1)
+sky_top_color = Color(0.2, 0.12, 0.38, 1)
+sky_horizon_color = Color(0.88, 0.45, 0.24, 1)
+ground_bottom_color = Color(0.14, 0.09, 0.06, 1)
+ground_horizon_color = Color(0.5, 0.28, 0.18, 1)
+sun_angle_max = 35.0
 
 [sub_resource type="Sky" id="Sky_twilight"]
 sky_material = SubResource("ProceduralSkyMaterial_twilight")
@@ -25,9 +28,22 @@ sky_material = SubResource("ProceduralSkyMaterial_twilight")
 [sub_resource type="Environment" id="Environment_twilight"]
 background_mode = 2
 sky = SubResource("Sky_twilight")
+ambient_light_source = 2
+ambient_light_color = Color(0.65, 0.45, 0.4, 1)
+ambient_light_energy = 0.3
 tonemap_mode = 2
-glow_enabled = true
-glow_bloom = 0.3
+tonemap_exposure = 1.0
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.2
+glow_enabled = false
+fog_enabled = true
+fog_light_color = Color(0.78, 0.42, 0.28, 1)
+fog_density = 0.003
+fog_sky_affect = 0.25
+adjustment_enabled = true
+adjustment_contrast = 1.05
+adjustment_saturation = 1.05
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(60, 1, 60)
@@ -62,10 +78,11 @@ environment = SubResource("Environment_twilight")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 20, 0)
-light_color = Color(1, 0.75, 0.55, 1)
-light_energy = 1.2
+light_color = Color(1, 0.78, 0.6, 1)
+light_energy = 1.05
 shadow_enabled = true
-directional_shadow_max_distance = 70.0
+shadow_blur = 1.2
+directional_shadow_max_distance = 65.0
 
 [node name="Arena" type="Node3D" parent="."]
 
@@ -245,3 +262,5 @@ chase_speed = 6.6
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 22)
 
 [node name="GameUI" parent="." instance=ExtResource("12_ui")]
+
+[node name="AmbientMotes" parent="." instance=ExtResource("13_motes")]

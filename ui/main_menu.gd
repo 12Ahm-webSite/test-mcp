@@ -1,6 +1,7 @@
 extends Control
 
 @onready var play_button: Button = $CenterContainer/MainPanel/VBox/BtnPlay
+@onready var battle_button: Button = $CenterContainer/MainPanel/VBox/BtnBattle
 @onready var level_select_button: Button = $CenterContainer/MainPanel/VBox/BtnLevelSelect
 @onready var controls_button: Button = $CenterContainer/MainPanel/VBox/BtnControls
 @onready var quit_button: Button = $CenterContainer/MainPanel/VBox/BtnQuit
@@ -31,6 +32,8 @@ func _ready() -> void:
 	controls_panel.visible = false
 	
 	play_button.pressed.connect(_on_play_pressed)
+	if battle_button:
+		battle_button.pressed.connect(_on_battle_pressed)
 	level_select_button.pressed.connect(_show_level_select)
 	controls_button.pressed.connect(_show_controls)
 	quit_button.pressed.connect(_on_quit_pressed)
@@ -100,6 +103,9 @@ func _on_play_pressed() -> void:
 		_load_level("res://scenes/levels/level_2_canyon.tscn")
 	else:
 		_load_level("res://scenes/levels/level_1_ruins.tscn")
+
+func _on_battle_pressed() -> void:
+	_load_level("res://scenes/levels/battle_1_ruins.tscn")
 
 func _load_level(path: String) -> void:
 	get_tree().change_scene_to_file(path)

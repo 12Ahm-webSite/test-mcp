@@ -3,6 +3,9 @@
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_script"]
 [ext_resource type="Material" path="res://assets/materials/mat_player_body.tres" id="2_body_mat"]
 [ext_resource type="Material" path="res://assets/materials/mat_player_accent.tres" id="3_accent_mat"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/ZC57/ZC57_Rigged.glb" id="4_pistol"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/MGP7/MGP7_Rigged.glb" id="5_smg"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/Grenades/M67V1_Rigged.glb" id="6_grenade"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
@@ -112,6 +115,29 @@ mesh = SubResource("CylinderMesh_leg")
 [node name="ShieldBubble" type="MeshInstance3D" parent="Model"]
 visible = false
 mesh = SubResource("SphereMesh_shield")
+
+[node name="WeaponSocket" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.08, -0.32)
+
+[node name="PistolModel" parent="Model/WeaponSocket" instance=ExtResource("4_pistol")]
+transform = Transform3D(0.38, 0, 0, 0, 0.38, 0, 0, 0, 0.38, 0, 0, 0)
+
+[node name="SMGModel" parent="Model/WeaponSocket" instance=ExtResource("5_smg")]
+transform = Transform3D(0.32, 0, 0, 0, 0.32, 0, 0, 0, 0.32, 0, 0, 0)
+visible = false
+
+[node name="GrenadeModel" parent="Model/WeaponSocket" instance=ExtResource("6_grenade")]
+transform = Transform3D(0.42, 0, 0, 0, 0.42, 0, 0, 0, 0.42, 0, 0, 0)
+visible = false
+
+[node name="MuzzlePoint" type="Node3D" parent="Model/WeaponSocket"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.42)
+
+[node name="MuzzleFlash" type="OmniLight3D" parent="Model/WeaponSocket/MuzzlePoint"]
+visible = false
+light_color = Color(1, 0.85, 0.3, 1)
+light_energy = 2.5
+omni_range = 3.0
 
 [node name="CameraPivot" type="Node3D" parent="."]
 top_level = true

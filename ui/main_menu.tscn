@@ -112,6 +112,16 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
 text = "START EXPEDITION"
 
+[node name="BtnBattle" type="Button" parent="CenterContainer/MainPanel/VBox"]
+custom_minimum_size = Vector2(240, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "⚔️ BATTLE MODE"
+
 [node name="BtnLevelSelect" type="Button" parent="CenterContainer/MainPanel/VBox"]
 custom_minimum_size = Vector2(240, 44)
 layout_mode = 2

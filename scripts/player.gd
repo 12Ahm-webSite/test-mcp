@@ -3,6 +3,14 @@ extends CharacterBody3D
 signal shield_changed(active: bool, duration: float)
 signal speed_boost_changed(active: bool, duration: float)
 signal dash_cooldown_updated(current: float, max_cooldown: float)
+signal health_changed(current: float, max_hp: float)
+signal weapon_swapped(type: int, weapon_dict: Dictionary)
+signal ammo_updated(type: int, current_ammo: int)
+signal player_eliminated(killer: Node3D)
+signal player_respawned()
+
+@export_group("Combat & Health")
+@export var max_health: float = 100.0
 
 @export_group("Locomotion")
 @export var walk_speed: float = 6.5
@@ -39,6 +47,30 @@ var is_active: bool = true
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
 @onready var camera: Camera3D = $CameraPivot/SpringArm3D/Camera3D
+
+# Weapon Socket & Models
+@onready var weapon_socket: Node3D = $Model/WeaponSocket if has_node("Model/WeaponSocket") else null
+@onready var pistol_model: Node3D = $Model/WeaponSocket/PistolModel if has_node("Model/WeaponSocket/PistolModel") else null
+@onready var smg_model: Node3D = $Model/WeaponSocket/SMGModel if has_node("Model/WeaponSocket/SMGModel") else null
+@onready var grenade_model: Node3D = $Model/WeaponSocket/GrenadeModel if has_node("Model/WeaponSocket/GrenadeModel") else null
+@onready var muzzle_point: Node3D = $Model/WeaponSocket/MuzzlePoint if has_node("Model/WeaponSocket/MuzzlePoint") else null
+@onready var muzzle_flash: OmniLight3D = $Model/WeaponSocket/MuzzlePoint/MuzzleFlash if has_node("Model/WeaponSocket/MuzzlePoint/MuzzleFlash") else null
+
+const PROJECTILE_SCENE := preload("res://scenes/projectile.tscn")
+
+# Combat & Weapon state
+var character_name: String = "Unit-07"
+var health: float = 100.0
+var is_dead: bool = false
+var unlocked_weapons: Array[int] = [WeaponData.WeaponType.PISTOL]
+var current_weapon: int = WeaponData.WeaponType.PISTOL
+var ammo: Dictionary = {
+	WeaponData.WeaponType.PISTOL: 999,
+	WeaponData.WeaponType.SMG: 0,
+	WeaponData.WeaponType.GRENADE: 0
+}
+var _fire_timer: float = 0.0
+var _recoil_offset: float = 0.0
 
 # Camera state
 var _camera_yaw: float = 0.0
@@ -79,6 +111,12 @@ func _ready() -> void:
 		shield_bubble.visible = false
 		
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	health = max_health
+	_update_weapon_models()
+	health_changed.emit(health, max_health)
+	weapon_swapped.emit(current_weapon, WeaponData.get_weapon(current_weapon))
+	ammo_updated.emit(current_weapon, ammo[current_weapon])
 
 func _setup_input_map() -> void:
 	var actions := {
@@ -105,13 +143,17 @@ func _setup_input_map() -> void:
 		InputMap.action_add_event("dash", mouse_ev)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_active:
+	if not is_active or is_dead:
 		return
 		
 	# Mouse lock / unlock controls
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		else:
+			var w_data := WeaponData.get_weapon(current_weapon)
+			if not w_data.get("is_automatic", false):
+				try_shoot()
 	elif event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.keycode == KEY_ESCAPE and event.pressed):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -122,11 +164,41 @@ func _unhandled_input(event: InputEvent) -> void:
 		_camera_pitch -= event.relative.y * mouse_sensitivity
 		_camera_pitch = clamp(_camera_pitch, min_pitch, max_pitch)
 
+	# Weapon selection (1, 2, 3)
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_1:
+			select_weapon(WeaponData.WeaponType.PISTOL)
+		elif event.keycode == KEY_2:
+			select_weapon(WeaponData.WeaponType.SMG)
+		elif event.keycode == KEY_3:
+			select_weapon(WeaponData.WeaponType.GRENADE)
+
+	# Weapon cycle (mouse wheel)
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			cycle_weapon(1)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			cycle_weapon(-1)
+
 func _physics_process(delta: float) -> void:
 	# Update cooldown timers
 	if _dash_cooldown_timer > 0.0:
 		_dash_cooldown_timer -= delta
 		dash_cooldown_updated.emit(clamp(_dash_cooldown_timer, 0.0, dash_cooldown), dash_cooldown)
+
+	# Fire cooldown & weapon recoil recovery
+	if _fire_timer > 0.0:
+		_fire_timer -= delta
+	_recoil_offset = lerp(_recoil_offset, 0.0, 16.0 * delta)
+	if weapon_socket:
+		weapon_socket.position.z = -0.32 + _recoil_offset
+
+	# Continuous automatic firing
+	if is_active and not is_dead and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			var w_data = WeaponData.get_weapon(current_weapon)
+			if w_data.get("is_automatic", false):
+				try_shoot()
 
 	# Update active buffs
 	_update_buffs(delta)
@@ -142,7 +214,7 @@ func _physics_process(delta: float) -> void:
 	# Update camera pivot tracking and trauma shake
 	_update_camera(delta)
 
-	if not is_active:
+	if not is_active or is_dead:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 		velocity.z = move_toward(velocity.z, 0.0, friction * delta)
 		move_and_slide()
@@ -321,10 +393,154 @@ func take_hit() -> bool:
 		var audio = get_tree().get_first_node_in_group("audio_manager")
 		if audio and audio.has_method("play_shield_hit"):
 			audio.play_shield_hit()
-		# Repel backwards slightly
 		velocity.y = 4.0
 		return false # Survived!
+	take_damage(100.0)
 	return true # Fatal hit
+
+func take_damage(amount: float, attacker: Node3D = null) -> void:
+	if is_dead:
+		return
+	if has_shield:
+		deactivate_shield()
+		add_camera_shake(0.55)
+		var audio = get_tree().get_first_node_in_group("audio_manager")
+		if audio and audio.has_method("play_shield_hit"):
+			audio.play_shield_hit()
+		velocity.y = 3.0
+		return
+		
+	health = maxf(0.0, health - amount)
+	health_changed.emit(health, max_health)
+	add_camera_shake(0.35)
+	
+	if health <= 0.0:
+		_die(attacker)
+
+func heal(amount: float) -> void:
+	if is_dead:
+		return
+	health = minf(max_health, health + amount)
+	health_changed.emit(health, max_health)
+
+func _die(killer: Node3D) -> void:
+	is_dead = true
+	is_active = false
+	visible = false
+	player_eliminated.emit(killer)
+	
+	var bm = get_tree().get_first_node_in_group("battle_manager")
+	if bm and bm.has_method("record_elimination"):
+		bm.record_elimination(killer, self)
+
+func respawn_at(pos: Vector3) -> void:
+	global_position = pos
+	velocity = Vector3.ZERO
+	health = max_health
+	is_dead = false
+	is_active = true
+	visible = true
+	health_changed.emit(health, max_health)
+	player_respawned.emit()
+
+# --- Weapon & Combat Systems ---
+
+func select_weapon(w_type: int) -> bool:
+	if not unlocked_weapons.has(w_type):
+		return false
+	if current_weapon == w_type:
+		return true
+	current_weapon = w_type
+	_update_weapon_models()
+	weapon_swapped.emit(current_weapon, WeaponData.get_weapon(current_weapon))
+	ammo_updated.emit(current_weapon, ammo.get(current_weapon, 0))
+	return true
+
+func cycle_weapon(dir: int) -> void:
+	if unlocked_weapons.is_empty():
+		return
+	var idx := unlocked_weapons.find(current_weapon)
+	if idx == -1:
+		idx = 0
+	var new_idx := (idx + dir) % unlocked_weapons.size()
+	if new_idx < 0:
+		new_idx += unlocked_weapons.size()
+	select_weapon(unlocked_weapons[new_idx])
+
+func pickup_weapon(w_type: int, amount: int) -> void:
+	if not unlocked_weapons.has(w_type):
+		unlocked_weapons.append(w_type)
+	ammo[w_type] = mini(ammo.get(w_type, 0) + amount, WeaponData.get_weapon(w_type).get("max_ammo", 999))
+	if current_weapon == WeaponData.WeaponType.PISTOL:
+		select_weapon(w_type)
+	else:
+		ammo_updated.emit(current_weapon, ammo.get(current_weapon, 0))
+
+func _update_weapon_models() -> void:
+	if pistol_model:
+		pistol_model.visible = (current_weapon == WeaponData.WeaponType.PISTOL)
+	if smg_model:
+		smg_model.visible = (current_weapon == WeaponData.WeaponType.SMG)
+	if grenade_model:
+		grenade_model.visible = (current_weapon == WeaponData.WeaponType.GRENADE)
+
+func try_shoot() -> bool:
+	if not is_active or is_dead or _fire_timer > 0.0:
+		return false
+	var cur_ammo: int = ammo.get(current_weapon, 0)
+	if cur_ammo <= 0:
+		return false
+		
+	var w_data := WeaponData.get_weapon(current_weapon)
+	_fire_timer = w_data.get("fire_rate", 0.25)
+	
+	if current_weapon != WeaponData.WeaponType.PISTOL:
+		ammo[current_weapon] -= 1
+		ammo_updated.emit(current_weapon, ammo[current_weapon])
+		if ammo[current_weapon] <= 0:
+			select_weapon(WeaponData.WeaponType.PISTOL)
+			
+	# Recoil kick
+	_recoil_offset = 0.08
+	
+	# Muzzle flash
+	if muzzle_flash:
+		muzzle_flash.visible = true
+		get_tree().create_timer(0.05).timeout.connect(func(): if muzzle_flash: muzzle_flash.visible = false)
+		
+	# SFX
+	var audio = get_tree().get_first_node_in_group("audio_manager")
+	var sfx_name: String = w_data.get("sfx_method", "play_pistol")
+	if audio and audio.has_method(sfx_name):
+		audio.call(sfx_name)
+		
+	# Origin & direction calculation
+	var origin: Vector3 = muzzle_point.global_position if muzzle_point else global_position + Vector3(0, 1.2, -0.5)
+	var shoot_dir: Vector3 = -model.global_transform.basis.z
+	
+	if camera:
+		var cam_pos: Vector3 = camera.global_position
+		var cam_forward: Vector3 = -camera.global_transform.basis.z
+		var space_state := get_world_3d().direct_space_state
+		var query := PhysicsRayQueryParameters3D.create(cam_pos, cam_pos + cam_forward * 100.0)
+		query.exclude = [self]
+		query.collision_mask = 1 | 4 | 8
+		var hit = space_state.intersect_ray(query)
+		var target_pt: Vector3 = hit.position if not hit.is_empty() else cam_pos + cam_forward * 80.0
+		shoot_dir = (target_pt - origin).normalized()
+	
+	# Spread deviation
+	var spread: float = w_data.get("spread", 0.015)
+	shoot_dir = (shoot_dir + Vector3(randf_range(-spread, spread), randf_range(-spread, spread), randf_range(-spread, spread))).normalized()
+	
+	# Spawn Projectile
+	var proj = PROJECTILE_SCENE.instantiate()
+	get_parent().add_child(proj)
+	proj.global_position = origin
+	proj.setup(self, shoot_dir, w_data)
+	
+	add_camera_shake(0.08 if current_weapon == WeaponData.WeaponType.SMG else 0.16)
+	return true
 
 func _update_procedural_animation(delta: float, h_speed: float, input_dir: Vector2) -> void:
 	# Detect landing impact

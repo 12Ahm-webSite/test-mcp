@@ -1,0 +1,68 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_bot.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/character.glb" id="2_character"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/ZC57/ZC57_Rigged.glb" id="3_pistol"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/MGP7/MGP7_Rigged.glb" id="4_smg"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bot"]
+radius = 0.45
+height = 1.8
+
+[node name="BattleBot" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_bot")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="CharacterMesh" parent="Model" instance=ExtResource("2_character")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="WeaponMount" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 0.55, -0.32)
+
+[node name="PistolModel" parent="Model/WeaponMount" instance=ExtResource("3_pistol")]
+transform = Transform3D(0.35, 0, 0, 0, 0.35, 0, 0, 0, 0.35, 0, 0, 0)
+
+[node name="SMGModel" parent="Model/WeaponMount" instance=ExtResource("4_smg")]
+transform = Transform3D(0.32, 0, 0, 0, 0.32, 0, 0, 0, 0.32, 0, 0, 0)
+visible = false
+
+[node name="MuzzlePoint" type="Node3D" parent="Model/WeaponMount"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.38)
+
+[node name="MuzzleFlash" type="OmniLight3D" parent="Model/WeaponMount/MuzzlePoint"]
+visible = false
+light_color = Color(1, 0.85, 0.2, 1)
+light_energy = 2.0
+omni_range = 2.5
+
+[node name="BillboardLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+billboard = 1
+text = "Bot-Alpha
+[██████████] 100%
+⚪ PATROL"
+font_size = 28
+outline_size = 6
+outline_modulate = Color(0, 0, 0, 0.8)
+
+[node name="RayObstacleCenter" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+target_position = Vector3(0, 0, -2.5)
+collision_mask = 1
+
+[node name="RayObstacleLeft" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+target_position = Vector3(-1.4, 0, -2.2)
+collision_mask = 1
+
+[node name="RayObstacleRight" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+target_position = Vector3(1.4, 0, -2.2)
+collision_mask = 1

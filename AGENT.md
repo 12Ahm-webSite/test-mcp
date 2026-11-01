@@ -165,18 +165,29 @@ Expected output:
 # ==============================================================================
 # 7. ROADMAP & REMAINING OPTIONAL ENHANCEMENTS
 # ==============================================================================
-When continuing development, prioritize these features:
-1. Mini-Radar / HUD Compass:
+COMPLETED ENHANCEMENTS:
+✓ Background Ambient Music (BGM):
+  - Procedural 16-bit PCM multi-track synthesizer added to `audio_manager.gd`.
+  - 3 custom seamless looping tracks generated specifically for Sector 1 (Ruins), Sector 2 (Canyon), and Sector 3 (Caverns).
+  - Integrated with `game_manager.gd` with automatic playback and game-over ducking.
+✓ Visual & Atmosphere Overhaul:
+  - Enabled Forward+ desktop rendering with full Screen Space Ambient Occlusion (SSAO) and ACES tonemapping.
+  - Added stylized Rim lighting to all terrain, rock, foliage, and barrier materials.
+  - Upgraded perimeter boundaries with glowing Holographic Forcefields (`mat_forcefield.tres`).
+  - Added ambient atmospheric floating motes (`scenes/vfx_ambient_motes.tscn`).
+  - Tuned volumetric fog, depth, and soft lighting for each sector.
+
+PRIORITIZED NEXT STEPS:
+1. Character Visual Redesign:
+   - Upgrade Unit-07 player robot with modular beveled armor, reactor core glow, and thruster VFX.
+   - Upgrade Sentinel enemy drone with menacing hunter chassis and hover repulsor ring.
+2. Mini-Radar / HUD Compass:
    - Add a compass bar or top-down circular radar in `ui/game_ui.tscn` showing
      dots for nearby crystals (cyan/gold/green) and a red skull/dot for Sentinel.
-2. Background Ambient Music (BGM):
-   - Add ambient sci-fi drone synthesizer or low-frequency pad to `audio_manager.gd`.
 3. Exporting & Distribution:
    - Windows 64-bit Desktop (.exe).
    - Linux x86_64 Desktop executable.
-   - Mobile Android APK with onscreen touch controls (Virtual Joystick & Action buttons).
-4. Visual Enhancements:
-   - Add subtle dust particle ambient emitters in the cavern level.
+   - Mobile Android APK with onscreen touch controls.
 
 # ==============================================================================
 # END OF SPECIFICATION
