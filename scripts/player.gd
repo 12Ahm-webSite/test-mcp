@@ -109,6 +109,9 @@ var _was_on_floor: bool = true
 
 func _ready() -> void:
 	add_to_group("player")
+	floor_constant_speed = true
+	floor_max_angle = 1.0
+	floor_snap_length = 0.4
 	_setup_input_map()
 	
 	if head:

@@ -3,7 +3,7 @@
 [ext_resource type="Material" path="res://assets/materials/mat_rock.tres" id="1_rock_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_rock"]
-size = Vector3(2.4, 1.5, 2.0)
+size = Vector3(2.8, 1.6, 2.4)
 
 [sub_resource type="SphereMesh" id="SphereMesh_boulder1"]
 material = ExtResource("1_rock_mat")
@@ -24,9 +24,11 @@ material = ExtResource("1_rock_mat")
 size = Vector3(0.5, 0.4, 0.5)
 
 [node name="PropRock" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.8, 0)
 shape = SubResource("BoxShape3D_rock")
 
 [node name="BoulderMain" type="MeshInstance3D" parent="."]

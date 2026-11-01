@@ -142,16 +142,16 @@ transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 10)
 transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, -10)
 
 [node name="PillarNW" parent="Monoliths" instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, -16, 0, -16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -16, 0, -16)
 
 [node name="PillarNE" parent="Monoliths" instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, 16, 0, -16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 16, 0, -16)
 
 [node name="PillarSW" parent="Monoliths" instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, -16, 0, 16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -16, 0, 16)
 
 [node name="PillarSE" parent="Monoliths" instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, 16, 0, 16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 16, 0, 16)
 
 [node name="Platforms" type="Node3D" parent="."]
 

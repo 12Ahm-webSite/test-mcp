@@ -153,16 +153,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 8)
 transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0.4, -3)
 
 [node name="CornerPillarNW" parent="Architecture" instance=ExtResource("9_pillar")]
-transform = Transform3D(1.3, 0, 0, 0, 1.5, 0, 0, 0, 1.3, -27, 0, -27)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -27, 0, -27)
 
 [node name="CornerPillarNE" parent="Architecture" instance=ExtResource("9_pillar")]
-transform = Transform3D(1.3, 0, 0, 0, 1.5, 0, 0, 0, 1.3, 27, 0, -27)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 27, 0, -27)
 
 [node name="CornerPillarSW" parent="Architecture" instance=ExtResource("9_pillar")]
-transform = Transform3D(1.3, 0, 0, 0, 1.5, 0, 0, 0, 1.3, -27, 0, 27)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -27, 0, 27)
 
 [node name="CornerPillarSE" parent="Architecture" instance=ExtResource("9_pillar")]
-transform = Transform3D(1.3, 0, 0, 0, 1.5, 0, 0, 0, 1.3, 27, 0, 27)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 27, 0, 27)
 
 [node name="DistantRuinNorth" parent="Architecture" instance=ExtResource("8_arch")]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -36)

@@ -3,13 +3,15 @@
 [ext_resource type="PackedScene" path="res://assets/models/pillar.glb" id="1_model"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_pillar"]
-height = 4.2
-radius = 0.65
+height = 7.2
+radius = 1.35
 
 [node name="PropTechPillar" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6, 0)
 shape = SubResource("CylinderShape3D_pillar")
 
 [node name="Model" parent="." instance=ExtResource("1_model")]

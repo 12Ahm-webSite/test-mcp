@@ -35,5 +35,3 @@ server/port=6550
 [rendering]
 
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="forward_plus"
-renderer/rendering_method.mobile="mobile"

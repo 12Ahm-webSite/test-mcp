@@ -135,16 +135,16 @@ transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 10)
 transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, -10)
 
 [node name="PillarNW" parent="Monoliths" unique_id=509454134 instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, -16, 0, -16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -16, 0, -16)
 
 [node name="PillarNE" parent="Monoliths" unique_id=1562508132 instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, 16, 0, -16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 16, 0, -16)
 
 [node name="PillarSW" parent="Monoliths" unique_id=1563743570 instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, -16, 0, 16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -16, 0, 16)
 
 [node name="PillarSE" parent="Monoliths" unique_id=1612796194 instance=ExtResource("10_pillar")]
-transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, 16, 0, 16)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 16, 0, 16)
 
 [node name="OmniLightCenter" type="OmniLight3D" parent="Monoliths" unique_id=1769511507]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)

@@ -1,26 +1,49 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/models/platform-large.glb" id="1_plat_model"]
 [ext_resource type="PackedScene" path="res://assets/models/stairs.glb" id="2_stairs_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_plat"]
-size = Vector3(6.0, 1.8, 6.0)
+size = Vector3(15.0, 4.0, 15.0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ramp"]
-size = Vector3(2.5, 0.4, 4.0)
+size = Vector3(9.0, 0.5, 10.182)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_stairs_back"]
+size = Vector3(9.0, 7.0, 4.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_stairs_front"]
+size = Vector3(9.0, 3.5, 3.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_landing"]
+size = Vector3(9.0, 7.5, 3.5)
 
 [node name="PropPlatform" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 1
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+[node name="PlatformCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0, 0)
 shape = SubResource("BoxShape3D_plat")
 
-[node name="PlatformModel" parent="." instance=ExtResource("1_plat_model")]
-transform = Transform3D(3.0, 0, 0, 0, 1.8, 0, 0, 0, 3.0, 0, 0, 0)
-
 [node name="RampCollision" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, 0.8, 4.5)
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 3.423, 6.623)
 shape = SubResource("BoxShape3D_ramp")
+
+[node name="StairsCoreBack" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 5.2)
+shape = SubResource("BoxShape3D_stairs_back")
+
+[node name="StairsCoreFront" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 8.8)
+shape = SubResource("BoxShape3D_stairs_front")
+
+[node name="StairsLanding" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.45, 1.6)
+shape = SubResource("BoxShape3D_landing")
+
+[node name="PlatformModel" parent="." instance=ExtResource("1_plat_model")]
+transform = Transform3D(3, 0, 0, 0, 1.8, 0, 0, 0, 3, 0, 0, 0)
 
 [node name="StairsModel" parent="." instance=ExtResource("2_stairs_model")]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, 0, 3.2)

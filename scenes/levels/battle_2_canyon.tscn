@@ -141,16 +141,16 @@ transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 8)
 transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, -8)
 
 [node name="Pillar1" parent="Architecture" instance=ExtResource("10_pillar")]
-transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -16, 0, 12)
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -16, 0, 12)
 
 [node name="Pillar2" parent="Architecture" instance=ExtResource("10_pillar")]
-transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 16, 0, 12)
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 16, 0, 12)
 
 [node name="Pillar3" parent="Architecture" instance=ExtResource("10_pillar")]
-transform = Transform3D(1, 0, 0, 0, 1.4, 0, 0, 0, 1, -18, 0, -10)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -18, 0, -10)
 
 [node name="Pillar4" parent="Architecture" instance=ExtResource("10_pillar")]
-transform = Transform3D(1, 0, 0, 0, 1.4, 0, 0, 0, 1, 18, 0, -10)
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 18, 0, -10)
 
 [node name="PlatStep1" parent="Architecture" instance=ExtResource("11_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.8, -2)
@@ -173,7 +173,7 @@ transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 2.6, -14)
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -15, 0, -22)
 
 [node name="Rock2" parent="Boulders" instance=ExtResource("12_rock")]
-transform = Transform3D(2.5, 0, 0, 0, 2, 0, 0, 0, 2.5, 15, 0, -22)
+transform = Transform3D(2.2, 0, 0, 0, 2.2, 0, 0, 0, 2.2, 15, 0, -22)
 
 [node name="Rock3" parent="Boulders" instance=ExtResource("12_rock")]
 transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, -20, 0, 5)
