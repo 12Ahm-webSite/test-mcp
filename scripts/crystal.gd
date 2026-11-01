@@ -97,18 +97,23 @@ func _on_body_entered(body: Node3D) -> void:
 		collected.emit(crystal_type, score)
 		
 		# Notify GameManager
-		var gm = get_tree().get_first_node_in_group("game_manager")
-		if gm and gm.has_method("collect_crystal"):
-			gm.collect_crystal(crystal_type, score)
-		elif gm and gm.has_method("add_crystal"):
-			gm.add_crystal()
+		if is_inside_tree() and get_tree():
+			var gm = get_tree().get_first_node_in_group("game_manager")
+			if gm and gm.has_method("collect_crystal"):
+				gm.collect_crystal(crystal_type, score)
+			elif gm and gm.has_method("add_crystal"):
+				gm.add_crystal()
 			
 		# Spawn Crystal Burst particles
 		_spawn_burst_vfx()
 		
 		# Elegant pickup scale animation
 		var tween := create_tween().set_parallel(true)
-		tween.tween_property(self, "scale", Vector3.ZERO, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		var model_node = get_node_or_null("Model")
+		if model_node:
+			tween.tween_property(model_node, "scale", Vector3(0.01, 0.01, 0.01), 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		else:
+			tween.tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 		tween.tween_property(self, "position:y", position.y + 0.6, 0.2).set_ease(Tween.EASE_OUT)
 		tween.chain().tween_callback(queue_free)
 

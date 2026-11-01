@@ -396,7 +396,8 @@ func _die(killer: Node3D) -> void:
 			
 		# Respawn after 2.5s
 		await get_tree().create_timer(2.5).timeout
-		_respawn()
+		if is_instance_valid(self) and is_inside_tree():
+			_respawn()
 
 func _drop_loot() -> void:
 	var parent_node := get_parent()
@@ -493,10 +494,14 @@ func _find_nearest_pickup(pickup_type: int) -> Node3D:
 # Buff hooks
 func activate_shield(duration: float = 12.0) -> void:
 	has_shield = true
-	await get_tree().create_timer(duration).timeout
-	has_shield = false
+	var timer := get_tree().create_timer(duration)
+	await timer.timeout
+	if is_instance_valid(self):
+		has_shield = false
 
 func activate_speed_boost(multiplier: float = 1.45, duration: float = 8.0) -> void:
 	speed_boost_factor = multiplier
-	await get_tree().create_timer(duration).timeout
-	speed_boost_factor = 1.0
+	var timer := get_tree().create_timer(duration)
+	await timer.timeout
+	if is_instance_valid(self):
+		speed_boost_factor = 1.0

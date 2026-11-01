@@ -120,7 +120,8 @@ func _consume() -> void:
 	
 	# Respawn timer
 	await get_tree().create_timer(respawn_time).timeout
-	_respawn()
+	if is_instance_valid(self) and is_inside_tree():
+		_respawn()
 
 func _respawn() -> void:
 	_is_active = true
@@ -128,8 +129,8 @@ func _respawn() -> void:
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
 	
-	# Spawn scale pop
-	scale = Vector3.ZERO
+	# Spawn scale pop (avoid singular zero scale)
+	scale = Vector3(0.01, 0.01, 0.01)
 	var tw := create_tween()
 	tw.tween_property(self, "scale", Vector3.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 

@@ -138,10 +138,11 @@ func _start_match() -> void:
 func _on_player_died(killer: Node3D) -> void:
 	# Continuous player respawn (fast 1.8s timer)
 	await get_tree().create_timer(1.8).timeout
-	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_method("respawn_at"):
-		var safe_sp := get_safe_spawn_point()
-		player.respawn_at(safe_sp)
+	if is_inside_tree() and get_tree():
+		var player = get_tree().get_first_node_in_group("player")
+		if player and player.has_method("respawn_at"):
+			var safe_sp := get_safe_spawn_point()
+			player.respawn_at(safe_sp)
 
 func record_elimination(killer: Node3D, victim: Node3D) -> void:
 	if is_battle_over and not portal_active:

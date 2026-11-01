@@ -60,7 +60,7 @@ func _connect_signals() -> void:
 	if not bm:
 		bm = owner
 		
-	if bm:
+	if bm and bm.has_signal("scores_updated"):
 		if not bm.scores_updated.is_connected(_on_scores_updated):
 			bm.scores_updated.connect(_on_scores_updated)
 		if not bm.kill_feed_announced.is_connected(_on_killfeed_event):
@@ -159,9 +159,11 @@ func _on_killfeed_event(killer: String, victim: String, icon: String) -> void:
 		
 	killfeed_container.add_child(entry)
 	
-	# Limit to 5 entries
+	# Limit to 5 entries (remove immediately from container, then queue_free)
 	while killfeed_container.get_child_count() > 5:
-		killfeed_container.get_child(0).queue_free()
+		var oldest := killfeed_container.get_child(0)
+		killfeed_container.remove_child(oldest)
+		oldest.queue_free()
 		
 	# Fade out after 4 seconds
 	get_tree().create_timer(4.0).timeout.connect(func():
