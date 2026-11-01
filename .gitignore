@@ -1,4 +1,84 @@
-# Godot 4+ specific ignores
+# ==========================================
+# Godot 4+ Engine Specific
+# ==========================================
 .godot/
+*.translation
+
+# ==========================================
+# Export & Build Binaries
+# ==========================================
+*.pck
+*.apk
+*.aab
+*.exe
+*.wasm
+*.app
+*.dmg
+*.ipa
+/build/
+/builds/
+/dist/
+/bin/
+/export/
+
+# Android / iOS native export projects
 /android/
+/ios/
+
+# Sensitive Export Presets (Uncomment if using keystores/signing credentials)
+# export_presets.cfg
+
+# ==========================================
+# Godot .NET / Mono / C#
+# ==========================================
+.mono/
+data_*/
+mono_crash.*.json
+[Bb]in/
+[Oo]bj/
+
+# ==========================================
+# Logs, Crash Dumps & Temp Files
+# ==========================================
+*.log
+crash.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# ==========================================
+# Operating System Files
+# ==========================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+[Tt]humbs.db
+[Tt]humbcache.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# Linux
+*~
+.directory
+
+# ==========================================
+# IDE & Code Editor Configs
+# ==========================================
+.idea/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# Scratch Scripts & Working Experiments
+# ==========================================
 scratch/
