@@ -1,51 +1,116 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://ui/game_ui.gd" id="1_script"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud"]
-bg_color = Color(0.08, 0.1, 0.14, 0.75)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_bar"]
+bg_color = Color(0.04, 0.07, 0.12, 0.85)
+border_width_bottom = 2
+border_color = Color(0.18, 0.65, 0.9, 0.6)
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+bg_color = Color(0.06, 0.1, 0.16, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 1, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_threat"]
+bg_color = Color(0.3, 0.05, 0.05, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.25, 0.25, 0.9)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
-content_margin_left = 16.0
-content_margin_top = 10.0
-content_margin_right = 16.0
-content_margin_bottom = 10.0
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_win"]
-bg_color = Color(0.1, 0.22, 0.15, 0.92)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toast"]
+bg_color = Color(0.03, 0.08, 0.14, 0.92)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.3, 0.85, 0.45, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 32.0
-content_margin_top = 24.0
-content_margin_right = 32.0
-content_margin_bottom = 24.0
+border_color = Color(0.3, 0.8, 1, 0.85)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 30.0
+content_margin_top = 14.0
+content_margin_right = 30.0
+content_margin_bottom = 14.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lose"]
-bg_color = Color(0.24, 0.1, 0.12, 0.92)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal_win"]
+bg_color = Color(0.05, 0.14, 0.1, 0.95)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.9, 0.25, 0.25, 1)
+border_color = Color(0.2, 0.9, 0.5, 0.9)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
-content_margin_left = 32.0
-content_margin_top = 24.0
-content_margin_right = 32.0
-content_margin_bottom = 24.0
+content_margin_left = 36.0
+content_margin_top = 28.0
+content_margin_right = 36.0
+content_margin_bottom = 28.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal_lose"]
+bg_color = Color(0.18, 0.04, 0.06, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1.0, 0.2, 0.25, 0.9)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 36.0
+content_margin_top = 28.0
+content_margin_right = 36.0
+content_margin_bottom = 28.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal_pause"]
+bg_color = Color(0.05, 0.08, 0.14, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25, 0.65, 0.95, 0.8)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 36.0
+content_margin_top = 28.0
+content_margin_right = 36.0
+content_margin_bottom = 28.0
 
 [node name="GameUI" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_script")
 
 [node name="HUD" type="Control" parent="."]
@@ -57,33 +122,165 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="HUD"]
-layout_mode = 0
-offset_left = 24.0
-offset_top = 24.0
-offset_right = 360.0
-offset_bottom = 110.0
+[node name="TopBar" type="PanelContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_bar")
 
-[node name="PanelContainer" type="PanelContainer" parent="HUD/MarginContainer"]
+[node name="Margin" type="MarginContainer" parent="HUD/TopBar"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/MarginContainer/PanelContainer"]
+[node name="HBox" type="HBoxContainer" parent="HUD/TopBar/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 30
 
-[node name="ScoreLabel" type="Label" parent="HUD/MarginContainer/PanelContainer/VBoxContainer"]
+[node name="SectorLabel" type="Label" parent="HUD/TopBar/Margin/HBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "💎 Crystals: 0 / 10"
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "SECTOR 1: THE SUNKEN RUINS"
 
-[node name="HintLabel" type="Label" parent="HUD/MarginContainer/PanelContainer/VBoxContainer"]
+[node name="VBoxEnergy" type="VBoxContainer" parent="HUD/TopBar/Margin/HBox"]
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.82, 0.88, 1)
+theme_override_constants/separation = 3
+
+[node name="EnergyLabel" type="Label" parent="HUD/TopBar/Margin/HBox/VBoxEnergy"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
 theme_override_font_sizes/font_size = 14
-text = "WASD: Move | SPACE: Jump | Collect all 10!"
+text = "CHRONO ENERGY: 0 / 10"
 
-[node name="EndScreen" type="CenterContainer" parent="."]
+[node name="EnergyBar" type="ProgressBar" parent="HUD/TopBar/Margin/HBox/VBoxEnergy"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+max_value = 10.0
+step = 1.0
+show_percentage = false
+
+[node name="ScoreLabel" type="Label" parent="HUD/TopBar/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "SCORE: 00000"
+horizontal_alignment = 1
+
+[node name="TimerLabel" type="Label" parent="HUD/TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "00:00.0"
+
+[node name="TopCenter" type="CenterContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 70.0
+offset_right = 250.0
+offset_bottom = 120.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="ThreatContainer" type="PanelContainer" parent="HUD/TopCenter"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_threat")
+
+[node name="ThreatLabel" type="Label" parent="HUD/TopCenter/ThreatContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "⚠️ THREAT CRITICAL: SENTINEL ENGAGED!"
+
+[node name="BottomLeft" type="VBoxContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -140.0
+offset_right = 260.0
+offset_bottom = -24.0
+grow_vertical = 0
+theme_override_constants/separation = 10
+mouse_filter = 2
+
+[node name="DashContainer" type="VBoxContainer" parent="HUD/BottomLeft"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DashLabel" type="Label" parent="HUD/BottomLeft/DashContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "DASH: READY [Q/E]"
+
+[node name="DashBar" type="ProgressBar" parent="HUD/BottomLeft/DashContainer"]
+custom_minimum_size = Vector2(180, 8)
+layout_mode = 2
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="BuffsContainer" type="HBoxContainer" parent="HUD/BottomLeft"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SpeedBadge" type="PanelContainer" parent="HUD/BottomLeft/BuffsContainer"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+
+[node name="Label" type="Label" parent="HUD/BottomLeft/BuffsContainer/SpeedBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "⚡ OVERDRIVE"
+
+[node name="ShieldBadge" type="PanelContainer" parent="HUD/BottomLeft/BuffsContainer"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+
+[node name="Label" type="Label" parent="HUD/BottomLeft/BuffsContainer/ShieldBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "🛡️ SHIELD"
+
+[node name="CenterNotice" type="CenterContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -120.0
+offset_right = 300.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ToastPanel" type="PanelContainer" parent="HUD/CenterNotice"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_toast")
+
+[node name="ToastLabel" type="Label" parent="HUD/CenterNotice/ToastPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.98, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "Objective: Collect 10 Energy Crystals!"
+horizontal_alignment = 1
+
+[node name="Modals" type="Control" parent="."]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -91,60 +288,178 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="WinPanel" type="PanelContainer" parent="EndScreen"]
+[node name="LevelClearPanel" type="CenterContainer" parent="Modals"]
 visible = false
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_win")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="EndScreen/WinPanel"]
+[node name="Panel" type="PanelContainer" parent="Modals/LevelClearPanel"]
+custom_minimum_size = Vector2(400, 260)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal_win")
+
+[node name="VBox" type="VBoxContainer" parent="Modals/LevelClearPanel/Panel"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="WinTitle" type="Label" parent="EndScreen/WinPanel/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="Modals/LevelClearPanel/Panel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 1.0, 0.5, 1)
-theme_override_font_sizes/font_size = 32
-text = "🎉 VICTORY! 🎉"
+theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 28
+text = "SECTOR 1 CLEARED!"
 horizontal_alignment = 1
 
-[node name="WinDesc" type="Label" parent="EndScreen/WinPanel/VBoxContainer"]
+[node name="StatsLabel" type="Label" parent="Modals/LevelClearPanel/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "You collected all 10 crystals and escaped!"
+theme_override_font_sizes/font_size = 16
+text = "Extraction Successful
+Time: 01:23.4
+Score: 1250 PTS"
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="EndScreen/WinPanel/VBoxContainer"]
-custom_minimum_size = Vector2(160, 44)
+[node name="HBox" type="HBoxContainer" parent="Modals/LevelClearPanel/Panel/VBox"]
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
-text = "Play Again"
+theme_override_constants/separation = 16
+alignment = 1
 
-[node name="LosePanel" type="PanelContainer" parent="EndScreen"]
+[node name="BtnReplayLevel" type="Button" parent="Modals/LevelClearPanel/Panel/VBox/HBox"]
+custom_minimum_size = Vector2(130, 42)
+layout_mode = 2
+text = "Replay"
+
+[node name="BtnNextLevel" type="Button" parent="Modals/LevelClearPanel/Panel/VBox/HBox"]
+custom_minimum_size = Vector2(150, 42)
+layout_mode = 2
+text = "Next Sector ➔"
+
+[node name="GameOverPanel" type="CenterContainer" parent="Modals"]
 visible = false
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_lose")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="EndScreen/LosePanel"]
+[node name="Panel" type="PanelContainer" parent="Modals/GameOverPanel"]
+custom_minimum_size = Vector2(400, 240)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal_lose")
+
+[node name="VBox" type="VBoxContainer" parent="Modals/GameOverPanel/Panel"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="LoseTitle" type="Label" parent="EndScreen/LosePanel/VBoxContainer"]
+[node name="Title" type="Label" parent="Modals/GameOverPanel/Panel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
-theme_override_font_sizes/font_size = 32
-text = "💀 CAUGHT! 💀"
+theme_override_colors/font_color = Color(1, 0.3, 0.35, 1)
+theme_override_font_sizes/font_size = 28
+text = "UNIT-07 OFFLINE"
 horizontal_alignment = 1
 
-[node name="LoseDesc" type="Label" parent="EndScreen/LosePanel/VBoxContainer"]
+[node name="Desc" type="Label" parent="Modals/GameOverPanel/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "The robot caught you before you finished!"
+theme_override_font_sizes/font_size = 16
+text = "Sentinel intercepted Unit-07.
+Chrono energy containment collapsed."
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="EndScreen/LosePanel/VBoxContainer"]
+[node name="HBox" type="HBoxContainer" parent="Modals/GameOverPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="BtnRetry" type="Button" parent="Modals/GameOverPanel/Panel/VBox/HBox"]
+custom_minimum_size = Vector2(130, 42)
+layout_mode = 2
+text = "Retry Mission"
+
+[node name="BtnMainMenu" type="Button" parent="Modals/GameOverPanel/Panel/VBox/HBox"]
+custom_minimum_size = Vector2(130, 42)
+layout_mode = 2
+text = "Main Menu"
+
+[node name="VictoryPanel" type="CenterContainer" parent="Modals"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Modals/VictoryPanel"]
+custom_minimum_size = Vector2(440, 300)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal_win")
+
+[node name="VBox" type="VBoxContainer" parent="Modals/VictoryPanel/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Modals/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 30
+text = "★ MISSION ACCOMPLISHED ★"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="Modals/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "All 3 Sectors Restored!
+Central Reactor Stabilized."
+horizontal_alignment = 1
+
+[node name="BtnMainMenu" type="Button" parent="Modals/VictoryPanel/Panel/VBox"]
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
-text = "Try Again"
+text = "Return to Base"
+
+[node name="PausePanel" type="CenterContainer" parent="Modals"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Modals/PausePanel"]
+custom_minimum_size = Vector2(320, 260)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal_pause")
+
+[node name="VBox" type="VBoxContainer" parent="Modals/PausePanel/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Modals/PausePanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "TRANSMISSION PAUSED"
+horizontal_alignment = 1
+
+[node name="BtnResume" type="Button" parent="Modals/PausePanel/Panel/VBox"]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Resume"
+
+[node name="BtnRestart" type="Button" parent="Modals/PausePanel/Panel/VBox"]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Restart Sector"
+
+[node name="BtnMainMenu" type="Button" parent="Modals/PausePanel/Panel/VBox"]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Main Menu"

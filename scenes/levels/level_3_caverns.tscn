@@ -1,0 +1,263 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_gm"]
+[ext_resource type="Material" path="res://assets/materials/mat_cavern_ground.tres" id="2_cavern"]
+[ext_resource type="Material" path="res://assets/materials/mat_wall.tres" id="3_wall"]
+[ext_resource type="Material" path="res://assets/materials/mat_neon_accent.tres" id="4_neon"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemy.tscn" id="6_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/crystal.tscn" id="7_crystal"]
+[ext_resource type="PackedScene" path="res://scenes/portal.tscn" id="8_portal"]
+[ext_resource type="PackedScene" path="res://scenes/prop_ruins_arch.tscn" id="9_arch"]
+[ext_resource type="PackedScene" path="res://scenes/prop_tech_pillar.tscn" id="10_pillar"]
+[ext_resource type="PackedScene" path="res://scenes/prop_platform.tscn" id="11_platform"]
+[ext_resource type="PackedScene" path="res://scenes/prop_rock.tscn" id="12_rock"]
+[ext_resource type="PackedScene" path="res://ui/game_ui.tscn" id="13_ui"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_neon"]
+sky_top_color = Color(0.04, 0.05, 0.12, 1)
+sky_horizon_color = Color(0.12, 0.08, 0.22, 1)
+ground_bottom_color = Color(0.02, 0.03, 0.06, 1)
+ground_horizon_color = Color(0.06, 0.08, 0.15, 1)
+
+[sub_resource type="Sky" id="Sky_neon"]
+sky_material = SubResource("ProceduralSkyMaterial_neon")
+
+[sub_resource type="Environment" id="Environment_neon"]
+background_mode = 2
+sky = SubResource("Sky_neon")
+ambient_light_source = 2
+ambient_light_color = Color(0.1, 0.15, 0.28, 1)
+ambient_light_energy = 0.8
+tonemap_mode = 2
+glow_enabled = true
+glow_bloom = 0.45
+glow_blend_mode = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(64, 1, 64)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = ExtResource("2_cavern")
+size = Vector3(64, 1, 64)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_ew"]
+size = Vector3(64, 8, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_ew"]
+material = ExtResource("3_wall")
+size = Vector3(64, 8, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_ns"]
+size = Vector3(2, 8, 64)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_ns"]
+material = ExtResource("3_wall")
+size = Vector3(2, 8, 64)
+
+[node name="Level3Caverns" type="Node3D"]
+script = ExtResource("1_gm")
+level_id = "level_3"
+level_title = "Sector 3: Neon Caverns"
+required_energy_crystals = 15
+next_level_scene = ""
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_neon")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 25, 0)
+light_color = Color(0.4, 0.7, 0.95, 1)
+light_energy = 0.7
+shadow_enabled = true
+directional_shadow_max_distance = 70.0
+
+[node name="Arena" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="WallNorth" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -32)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallNorth"]
+shape = SubResource("BoxShape3D_wall_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallNorth"]
+mesh = SubResource("BoxMesh_wall_ew")
+
+[node name="WallSouth" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 32)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallSouth"]
+shape = SubResource("BoxShape3D_wall_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallSouth"]
+mesh = SubResource("BoxMesh_wall_ew")
+
+[node name="WallWest" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallWest"]
+shape = SubResource("BoxShape3D_wall_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallWest"]
+mesh = SubResource("BoxMesh_wall_ns")
+
+[node name="WallEast" type="StaticBody3D" parent="Arena"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 4, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/WallEast"]
+shape = SubResource("BoxShape3D_wall_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/WallEast"]
+mesh = SubResource("BoxMesh_wall_ns")
+
+[node name="Monoliths" type="Node3D" parent="."]
+
+[node name="Arch1" parent="Monoliths" instance=ExtResource("9_arch")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 10)
+
+[node name="Arch2" parent="Monoliths" instance=ExtResource("9_arch")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, -10)
+
+[node name="PillarNW" parent="Monoliths" instance=ExtResource("10_pillar")]
+transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, -16, 0, -16)
+
+[node name="PillarNE" parent="Monoliths" instance=ExtResource("10_pillar")]
+transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, 16, 0, -16)
+
+[node name="PillarSW" parent="Monoliths" instance=ExtResource("10_pillar")]
+transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, -16, 0, 16)
+
+[node name="PillarSE" parent="Monoliths" instance=ExtResource("10_pillar")]
+transform = Transform3D(1.2, 0, 0, 0, 1.6, 0, 0, 0, 1.2, 16, 0, 16)
+
+[node name="OmniLightCenter" type="OmniLight3D" parent="Monoliths"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
+light_color = Color(0.2, 0.8, 1, 1)
+light_energy = 2.5
+omni_range = 24.0
+
+[node name="Platforms" type="Node3D" parent="."]
+
+[node name="Plat1" parent="Platforms" instance=ExtResource("11_platform")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -12, 1.2, 0)
+
+[node name="Plat2" parent="Platforms" instance=ExtResource("11_platform")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 12, 1.2, 0)
+
+[node name="Plat3" parent="Platforms" instance=ExtResource("11_platform")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 2.2, 0)
+
+[node name="Plat4" parent="Platforms" instance=ExtResource("11_platform")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -8, 3.2, -10)
+
+[node name="Plat5" parent="Platforms" instance=ExtResource("11_platform")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 8, 3.2, -10)
+
+[node name="Portal" parent="." instance=ExtResource("8_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -25)
+
+[node name="Crystals" type="Node3D" parent="."]
+
+[node name="EnergyCrystal1" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0.5, 20)
+crystal_type = 0
+
+[node name="EnergyCrystal2" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0.5, 20)
+crystal_type = 0
+
+[node name="EnergyCrystal3" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 18)
+crystal_type = 0
+
+[node name="EnergyCrystal4" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, 10)
+crystal_type = 0
+
+[node name="EnergyCrystal5" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, 10)
+crystal_type = 0
+
+[node name="EnergyCrystal6" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.4, 0)
+crystal_type = 0
+
+[node name="EnergyCrystal7" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.4, 0)
+crystal_type = 0
+
+[node name="EnergyCrystal8" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+crystal_type = 0
+
+[node name="EnergyCrystal9" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4.4, -10)
+crystal_type = 0
+
+[node name="EnergyCrystal10" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 4.4, -10)
+crystal_type = 0
+
+[node name="EnergyCrystal11" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, -18)
+crystal_type = 0
+
+[node name="EnergyCrystal12" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, -18)
+crystal_type = 0
+
+[node name="EnergyCrystal13" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.5, -22)
+crystal_type = 0
+
+[node name="EnergyCrystal14" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.5, -22)
+crystal_type = 0
+
+[node name="EnergyCrystal15" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -18)
+crystal_type = 0
+
+[node name="SpeedCrystal1" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, 0)
+crystal_type = 1
+
+[node name="SpeedCrystal2" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 0)
+crystal_type = 1
+
+[node name="ShieldCrystal1" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.5, 8)
+crystal_type = 2
+
+[node name="ShieldCrystal2" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.5, 8)
+crystal_type = 2
+
+[node name="RareCrystal1" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.5, -6)
+crystal_type = 3
+
+[node name="RareCrystal2" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.5, -6)
+crystal_type = 3
+
+[node name="Enemy" parent="." instance=ExtResource("6_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
+patrol_speed = 5.0
+chase_speed = 7.4
+view_distance = 28.0
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 24)
+
+[node name="GameUI" parent="." instance=ExtResource("13_ui")]

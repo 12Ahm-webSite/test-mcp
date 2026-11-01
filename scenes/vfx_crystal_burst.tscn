@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/vfx_crystal_burst.gd" id="1_script"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_burst"]
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 3.5
+initial_velocity_max = 6.5
+gravity = Vector3(0, -8.0, 0)
+scale_min = 0.08
+scale_max = 0.18
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sparkle"]
+albedo_color = Color(0.2, 0.9, 1, 1)
+emission_enabled = true
+emission = Color(0.2, 0.9, 1, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_sparkle"]
+material = SubResource("StandardMaterial3D_sparkle")
+size = Vector3(0.12, 0.12, 0.12)
+
+[node name="CrystalBurst" type="GPUParticles3D"]
+emitting = false
+amount = 22
+lifetime = 0.75
+one_shot = true
+explosiveness = 0.92
+process_material = SubResource("ParticleProcessMaterial_burst")
+draw_pass_1 = SubResource("BoxMesh_sparkle")
+script = ExtResource("1_script")

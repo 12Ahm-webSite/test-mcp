@@ -29,7 +29,7 @@ size = Vector3(0.28, 0.3, 0.4)
 
 [sub_resource type="BoxMesh" id="BoxMesh_arm"]
 material = ExtResource("2_body_mat")
-size = Vector3(0.22, 0.7, 0.25)
+size = Vector3(0.22, 0.65, 0.25)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_base"]
 material = ExtResource("2_body_mat")
@@ -59,14 +59,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
 mesh = SubResource("CylinderMesh_head")
 
 [node name="Eye" type="MeshInstance3D" parent="Model/Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.28)
 mesh = SubResource("BoxMesh_eye")
 
 [node name="EyeLight" type="OmniLight3D" parent="Model/Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.6)
 light_color = Color(1, 0.08, 0.08, 1)
 light_energy = 2.5
-omni_range = 4.0
+omni_range = 5.0
 
 [node name="ShoulderL" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.58, 0.35, 0)
@@ -76,14 +76,35 @@ mesh = SubResource("BoxMesh_shoulder")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.58, 0.35, 0)
 mesh = SubResource("BoxMesh_shoulder")
 
-[node name="ArmL" type="MeshInstance3D" parent="Model"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, -0.15, 0.1)
+[node name="ArmL_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.25, 0)
+
+[node name="ArmMesh" type="MeshInstance3D" parent="Model/ArmL_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, -0.1)
 mesh = SubResource("BoxMesh_arm")
 
-[node name="ArmR" type="MeshInstance3D" parent="Model"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, -0.15, 0.1)
+[node name="ArmR_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.25, 0)
+
+[node name="ArmMesh" type="MeshInstance3D" parent="Model/ArmR_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, -0.1)
 mesh = SubResource("BoxMesh_arm")
 
 [node name="HoverBase" type="MeshInstance3D" parent="Model"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.45, 0)
 mesh = SubResource("CylinderMesh_base")
+
+[node name="RayCastForward" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+target_position = Vector3(0, 0, -2.5)
+collision_mask = 1
+
+[node name="RayCastLeft" type="RayCast3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0, 0.6, 0)
+target_position = Vector3(0, 0, -2.2)
+collision_mask = 1
+
+[node name="RayCastRight" type="RayCast3D" parent="."]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 0, 0.6, 0)
+target_position = Vector3(0, 0, -2.2)
+collision_mask = 1

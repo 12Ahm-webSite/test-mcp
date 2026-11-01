@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Material" path="res://assets/materials/mat_rock.tres" id="1_rock"]
+[ext_resource type="Material" path="res://assets/materials/mat_wall.tres" id="2_wall"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_plat"]
+size = Vector3(6.0, 1.8, 6.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_plat"]
+material = ExtResource("1_rock")
+size = Vector3(6.0, 1.8, 6.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ramp"]
+size = Vector3(2.5, 0.4, 4.0)
+
+[sub_resource type="PrismMesh" id="PrismMesh_ramp"]
+material = ExtResource("2_wall")
+left_to_right = 0.0
+size = Vector3(2.5, 1.8, 3.8)
+
+[node name="PropPlatform" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_plat")
+
+[node name="PlatformMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("BoxMesh_plat")
+
+[node name="RampCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.927184, 0.374607, 0, -0.374607, 0.927184, 0, 0.8, 4.5)
+shape = SubResource("BoxShape3D_ramp")
+
+[node name="RampMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.9, 4.8)
+mesh = SubResource("PrismMesh_ramp")
