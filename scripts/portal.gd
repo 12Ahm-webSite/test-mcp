@@ -72,7 +72,7 @@ func _on_body_entered(body: Node3D) -> void:
 		portal_entered.emit()
 		var gm = get_tree().get_first_node_in_group("game_manager")
 		if gm and gm.has_method("on_portal_reached"):
-			gm.on_portal_reached()
+			gm.call_deferred("on_portal_reached")
 		var bm = get_tree().get_first_node_in_group("battle_manager")
 		if bm and bm.has_method("on_portal_reached"):
-			bm.on_portal_reached()
+			bm.call_deferred("on_portal_reached")

@@ -299,6 +299,6 @@ func on_portal_reached() -> void:
 		audio.play_victory()
 		
 	if not next_sector_scene.is_empty():
-		get_tree().change_scene_to_file(next_sector_scene)
+		get_tree().call_deferred("change_scene_to_file", next_sector_scene)
 	else:
 		battle_ended.emit(true, "Unit-07")
