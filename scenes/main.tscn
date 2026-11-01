@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://scenes/prop_tree.tscn" id="7_tree"]
 [ext_resource type="PackedScene" path="res://scenes/prop_rock.tscn" id="8_rock"]
 [ext_resource type="PackedScene" path="res://ui/game_ui.tscn" id="9_ui"]
+[ext_resource type="PackedScene" path="res://scenes/portal.tscn" id="10_portal"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.35, 0.65, 0.95, 1)
@@ -180,6 +181,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.8, -10)
 
 [node name="Crystal10" parent="Crystals" unique_id=1997683825 instance=ExtResource("6_crystal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.8, 6)
+
+[node name="Portal" parent="." instance=ExtResource("10_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -22)
 
 [node name="Player" parent="." unique_id=894166209 instance=ExtResource("4_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)

@@ -54,6 +54,11 @@ func _refresh_level_buttons() -> void:
 	if not _save_mgr:
 		return
 		
+	if _save_mgr.unlocked_levels > 1:
+		play_button.text = "CONTINUE (SECTOR %d)" % mini(_save_mgr.unlocked_levels, 3)
+	else:
+		play_button.text = "START EXPEDITION"
+		
 	# Level 1 always unlocked
 	btn_level_1.disabled = false
 	var hs1: int = _save_mgr.get_high_score("level_1")

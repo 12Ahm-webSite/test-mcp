@@ -18,10 +18,12 @@ var is_game_over: bool = false
 var is_portal_active: bool = false
 
 @onready var save_mgr: Node = preload("res://scripts/save_manager.gd").new()
+@onready var audio_mgr: Node = preload("res://scripts/audio_manager.gd").new()
 
 func _ready() -> void:
 	add_to_group("game_manager")
 	add_child(save_mgr)
+	add_child(audio_mgr)
 	call_deferred("_init_level")
 
 func _init_level() -> void:
@@ -40,21 +42,30 @@ func collect_crystal(crystal_type: int, score: int) -> void:
 	current_score += score
 	score_updated.emit(current_score)
 	
+	if audio_mgr and audio_mgr.has_method("play_crystal"):
+		audio_mgr.play_crystal(crystal_type)
+	
+	# Every crystal collected increments the stage objective!
+	collected_energy_crystals += 1
+	energy_updated.emit(collected_energy_crystals, required_energy_crystals)
+	
+	if collected_energy_crystals >= required_energy_crystals and not is_portal_active:
+		_activate_portal()
+	
 	match crystal_type:
 		0: # ENERGY
-			collected_energy_crystals += 1
-			energy_updated.emit(collected_energy_crystals, required_energy_crystals)
-			if collected_energy_crystals >= required_energy_crystals and not is_portal_active:
-				_activate_portal()
+			pass
 		1: # SPEED
-			toast_announced.emit("⚡ Overdrive Activated! +Speed")
+			toast_announced.emit("⚡ Overdrive Activated! +Speed (+1 Energy)")
 		2: # SHIELD
-			toast_announced.emit("🛡️ Energy Barrier Online! +Shield")
+			toast_announced.emit("🛡️ Energy Barrier Online! +Shield (+1 Energy)")
 		3: # RARE
-			toast_announced.emit("💎 Rare Chrono-Relic! +500 PTS")
+			toast_announced.emit("💎 Rare Chrono-Relic! +500 PTS (+1 Energy)")
 
 func _activate_portal() -> void:
 	is_portal_active = true
+	if audio_mgr and audio_mgr.has_method("play_portal"):
+		audio_mgr.play_portal()
 	var portal = get_tree().get_first_node_in_group("portal")
 	if not portal:
 		portal = get_node_or_null("Portal")

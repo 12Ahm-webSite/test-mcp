@@ -260,6 +260,9 @@ func _enter_state(new_state: State) -> void:
 				eye_light.light_color = Color(1.0, 0.0, 0.0)
 				eye_light.light_energy = 4.0
 				eye_light.omni_range = 7.0
+			var audio = get_tree().get_first_node_in_group("audio_manager")
+			if audio and audio.has_method("play_alert"):
+				audio.play_alert()
 		State.SEARCH:
 			# Extra search time if player repeats hiding in this zone
 			var extra_time := _get_zone_familiarity(last_seen_position) * 1.5

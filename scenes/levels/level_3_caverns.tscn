@@ -188,23 +188,35 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, 10)
 crystal_type = 0
 
 [node name="EnergyCrystal6" parent="Crystals" instance=ExtResource("7_crystal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 1.8, 0)
 crystal_type = 0
 
 [node name="EnergyCrystal7" parent="Crystals" instance=ExtResource("7_crystal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.8, 0)
 crystal_type = 0
 
 [node name="EnergyCrystal8" parent="Crystals" instance=ExtResource("7_crystal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 crystal_type = 0
 
 [node name="EnergyCrystal9" parent="Crystals" instance=ExtResource("7_crystal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4.4, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.2, -10)
 crystal_type = 0
 
 [node name="EnergyCrystal10" parent="Crystals" instance=ExtResource("7_crystal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 4.4, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.2, -10)
+crystal_type = 0
+
+[node name="EnergyCrystal16" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.5, 0)
+crystal_type = 0
+
+[node name="EnergyCrystal17" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 0)
+crystal_type = 0
+
+[node name="EnergyCrystal18" parent="Crystals" instance=ExtResource("7_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -6)
 crystal_type = 0
 
 [node name="EnergyCrystal11" parent="Crystals" instance=ExtResource("7_crystal")]

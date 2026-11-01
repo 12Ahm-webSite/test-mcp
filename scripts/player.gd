@@ -168,6 +168,9 @@ func _physics_process(delta: float) -> void:
 			_jump_count += 1
 			if _jump_count == 2:
 				add_camera_shake(0.2) # Small punch on double jump
+			var audio = get_tree().get_first_node_in_group("audio_manager")
+			if audio and audio.has_method("play_jump"):
+				audio.play_jump()
 
 	# Get input vector
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
@@ -241,6 +244,10 @@ func _start_dash(move_dir: Vector3) -> void:
 	# Instantly face dash direction
 	model.rotation.y = atan2(-_dash_direction.x, -_dash_direction.z)
 	add_camera_shake(0.35)
+	
+	var audio = get_tree().get_first_node_in_group("audio_manager")
+	if audio and audio.has_method("play_dash"):
+		audio.play_dash()
 
 func _update_camera(delta: float) -> void:
 	if not camera_pivot:
@@ -311,6 +318,9 @@ func take_hit() -> bool:
 		# Shield absorbs the hit!
 		deactivate_shield()
 		add_camera_shake(0.55)
+		var audio = get_tree().get_first_node_in_group("audio_manager")
+		if audio and audio.has_method("play_shield_hit"):
+			audio.play_shield_hit()
 		# Repel backwards slightly
 		velocity.y = 4.0
 		return false # Survived!
