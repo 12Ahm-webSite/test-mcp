@@ -241,3 +241,4 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_btn_normal")
 text = "🔄
 SWAP"
+
