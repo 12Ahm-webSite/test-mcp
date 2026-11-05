@@ -46,6 +46,7 @@ crash.log
 *.bak
 *.swp
 *~
+*.mp4
 
 # ==========================================
 # Operating System Files

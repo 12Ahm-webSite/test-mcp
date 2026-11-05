@@ -19,6 +19,7 @@ extends Control
 @onready var btn_back_controls: Button = $CenterContainer/ControlsPanel/VBox/BtnBack
 @onready var slider_sensitivity: HSlider = $CenterContainer/ControlsPanel/VBox/HBoxSens/SensitivitySlider
 @onready var lbl_sens_val: Label = $CenterContainer/ControlsPanel/VBox/HBoxSens/SensValLabel
+@onready var check_touch: CheckBox = $CenterContainer/ControlsPanel/VBox/CheckTouchControls if has_node("CenterContainer/ControlsPanel/VBox/CheckTouchControls") else null
 
 var _save_mgr: Node = null
 
@@ -50,6 +51,12 @@ func _ready() -> void:
 		slider_sensitivity.value = current_sens * 1000.0
 		lbl_sens_val.text = "%.1f" % slider_sensitivity.value
 		
+	if check_touch:
+		check_touch.button_pressed = bool(_save_mgr.get_setting("touch_controls_enabled", false))
+		check_touch.toggled.connect(func(enabled: bool):
+			_save_mgr.set_setting("touch_controls_enabled", enabled)
+		)
+
 	_refresh_level_buttons()
 	play_button.grab_focus()
 
@@ -66,7 +73,9 @@ func _refresh_level_buttons() -> void:
 	btn_level_1.disabled = false
 	var hs1: int = _save_mgr.get_high_score("level_1")
 	var bt1: float = _save_mgr.get_best_time("level_1")
-	lbl_stats_1.text = "Best: %d PTS | Time: %s" % [hs1, _format_time(bt1)]
+	var rk1: String = _save_mgr.get_best_rank("level_1")
+	var rk1_tag := (" [★ %s]" % rk1) if rk1 != "-" else ""
+	lbl_stats_1.text = "Best: %d PTS | Time: %s%s" % [hs1, _format_time(bt1), rk1_tag]
 	
 	# Level 2 unlocked if level_1 completed
 	var unlocked_2: bool = _save_mgr.is_level_unlocked("level_2")
@@ -74,7 +83,9 @@ func _refresh_level_buttons() -> void:
 	if unlocked_2:
 		var hs2: int = _save_mgr.get_high_score("level_2")
 		var bt2: float = _save_mgr.get_best_time("level_2")
-		lbl_stats_2.text = "Best: %d PTS | Time: %s" % [hs2, _format_time(bt2)]
+		var rk2: String = _save_mgr.get_best_rank("level_2")
+		var rk2_tag := (" [★ %s]" % rk2) if rk2 != "-" else ""
+		lbl_stats_2.text = "Best: %d PTS | Time: %s%s" % [hs2, _format_time(bt2), rk2_tag]
 	else:
 		lbl_stats_2.text = "🔒 Locked - Clear Sector 1"
 		
@@ -84,7 +95,9 @@ func _refresh_level_buttons() -> void:
 	if unlocked_3:
 		var hs3: int = _save_mgr.get_high_score("level_3")
 		var bt3: float = _save_mgr.get_best_time("level_3")
-		lbl_stats_3.text = "Best: %d PTS | Time: %s" % [hs3, _format_time(bt3)]
+		var rk3: String = _save_mgr.get_best_rank("level_3")
+		var rk3_tag := (" [★ %s]" % rk3) if rk3 != "-" else ""
+		lbl_stats_3.text = "Best: %d PTS | Time: %s%s" % [hs3, _format_time(bt3), rk3_tag]
 	else:
 		lbl_stats_3.text = "🔒 Locked - Clear Sector 2"
 

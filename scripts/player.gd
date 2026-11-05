@@ -84,6 +84,11 @@ var _is_first_person: bool = true
 var is_aiming: bool = false
 var ads_fov: float = 44.0
 
+# Mobile touch controls state
+var touch_move_vector: Vector2 = Vector2.ZERO
+var _touch_aim_active: bool = false
+var _touch_fire_active: bool = false
+
 # Camera state
 var _camera_yaw: float = 0.0
 var _camera_pitch: float = deg_to_rad(-18.0)
@@ -152,7 +157,8 @@ func _setup_input_map() -> void:
 		"move_right": [KEY_D, KEY_RIGHT],
 		"jump": [KEY_SPACE],
 		"sprint": [KEY_SHIFT],
-		"dash": [KEY_Q, KEY_E]
+		"dash": [KEY_Q, KEY_E],
+		"shoot": []
 	}
 	for action: String in actions:
 		if not InputMap.has_action(action):
@@ -209,14 +215,43 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			cycle_weapon(1)
 
+func rotate_camera_touch(relative: Vector2) -> void:
+	if not is_active or is_dead:
+		return
+	var sens: float = mouse_sensitivity * 1.35 * (0.50 if is_aiming else 1.0)
+	if _is_first_person:
+		rotate_y(-relative.x * sens)
+		_camera_pitch = clamp(_camera_pitch - relative.y * sens, deg_to_rad(-85.0), deg_to_rad(85.0))
+		if head:
+			head.rotation.x = _camera_pitch
+	else:
+		_camera_yaw -= relative.x * sens
+		_camera_pitch -= relative.y * sens
+		_camera_pitch = clamp(_camera_pitch, min_pitch, max_pitch)
+
+func set_touch_aim(active: bool) -> void:
+	_touch_aim_active = active
+	is_aiming = _touch_aim_active
+
+func toggle_aim() -> void:
+	set_touch_aim(!_touch_aim_active)
+
+func set_touch_fire(active: bool) -> void:
+	_touch_fire_active = active
+	if active:
+		try_shoot()
+
 func _physics_process(delta: float) -> void:
 	# Update cooldown timers
 	if _dash_cooldown_timer > 0.0:
 		_dash_cooldown_timer -= delta
 		dash_cooldown_updated.emit(clamp(_dash_cooldown_timer, 0.0, dash_cooldown), dash_cooldown)
 
-	# Aim Down Sights (Right Mouse Button)
-	is_aiming = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) and is_active and not is_dead
+	# Aim Down Sights (Right Mouse Button or Touch Aim)
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		is_aiming = is_active and not is_dead
+	else:
+		is_aiming = _touch_aim_active and is_active and not is_dead
 
 	# Fire cooldown & weapon recoil recovery
 	if _fire_timer > 0.0:
@@ -244,8 +279,9 @@ func _physics_process(delta: float) -> void:
 			weapon_socket.position.z = -0.32 + _recoil_offset
 
 	# Continuous automatic firing
-	if is_active and not is_dead and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	var is_firing := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_action_pressed("shoot") or _touch_fire_active
+	if is_active and not is_dead and is_firing:
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or _touch_fire_active or OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
 			var w_data = WeaponData.get_weapon(current_weapon)
 			if w_data.get("is_automatic", false):
 				try_shoot()
@@ -327,6 +363,8 @@ func _physics_process(delta: float) -> void:
 
 	# Get input vector
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	if touch_move_vector.length_squared() > 0.001:
+		input_dir = touch_move_vector
 
 	# Movement relative to camera / body
 	var move_dir := Vector3.ZERO

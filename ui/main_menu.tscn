@@ -267,6 +267,11 @@ custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "3.0"
 
+[node name="CheckTouchControls" type="CheckBox" parent="CenterContainer/ControlsPanel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Enable Virtual Touch Controls"
+
 [node name="BtnBack" type="Button" parent="CenterContainer/ControlsPanel/VBox"]
 custom_minimum_size = Vector2(160, 38)
 layout_mode = 2

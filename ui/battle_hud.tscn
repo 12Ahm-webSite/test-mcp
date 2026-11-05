@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle_hud.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/mobile_touch_controls.tscn" id="2_touch"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
 bg_color = Color(0.1, 0.12, 0.16, 0.75)
@@ -303,4 +304,6 @@ text = "PLAY AGAIN"
 custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 text = "MAIN MENU"
+
+[node name="MobileTouchControls" parent="." instance=ExtResource("2_touch")]
 

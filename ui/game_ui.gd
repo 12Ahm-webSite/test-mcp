@@ -28,6 +28,8 @@ extends CanvasLayer
 # --- Menus and Modals ---
 @onready var level_clear_panel: Control = $Modals/LevelClearPanel
 @onready var level_clear_title: Label = $Modals/LevelClearPanel/Panel/VBox/TitleLabel
+@onready var rank_letter: Label = $Modals/LevelClearPanel/Panel/VBox/RankBadge/RankLetter if has_node("Modals/LevelClearPanel/Panel/VBox/RankBadge/RankLetter") else null
+@onready var rank_title: Label = $Modals/LevelClearPanel/Panel/VBox/RankBadge/RankTitle if has_node("Modals/LevelClearPanel/Panel/VBox/RankBadge/RankTitle") else null
 @onready var level_clear_stats: Label = $Modals/LevelClearPanel/Panel/VBox/StatsLabel
 @onready var btn_next_level: Button = $Modals/LevelClearPanel/Panel/VBox/HBox/BtnNextLevel
 @onready var btn_replay_level: Button = $Modals/LevelClearPanel/Panel/VBox/HBox/BtnReplayLevel
@@ -37,6 +39,8 @@ extends CanvasLayer
 @onready var btn_main_menu_over: Button = $Modals/GameOverPanel/Panel/VBox/HBox/BtnMainMenu
 
 @onready var victory_panel: Control = $Modals/VictoryPanel
+@onready var victory_rank_letter: Label = $Modals/VictoryPanel/Panel/VBox/RankBadge/RankLetter if has_node("Modals/VictoryPanel/Panel/VBox/RankBadge/RankLetter") else null
+@onready var victory_rank_title: Label = $Modals/VictoryPanel/Panel/VBox/RankBadge/RankTitle if has_node("Modals/VictoryPanel/Panel/VBox/RankBadge/RankTitle") else null
 @onready var victory_stats: Label = $Modals/VictoryPanel/Panel/VBox/StatsLabel
 @onready var btn_victory_menu: Button = $Modals/VictoryPanel/Panel/VBox/BtnMainMenu
 
@@ -44,6 +48,7 @@ extends CanvasLayer
 @onready var btn_resume: Button = $Modals/PausePanel/Panel/VBox/BtnResume
 @onready var btn_pause_restart: Button = $Modals/PausePanel/Panel/VBox/BtnRestart
 @onready var btn_pause_menu: Button = $Modals/PausePanel/Panel/VBox/BtnMainMenu
+@onready var touch_controls: MobileTouchControls = $MobileTouchControls if has_node("MobileTouchControls") else null
 
 var _gm: Node = null
 var _player: Node3D = null
@@ -349,20 +354,63 @@ func show_toast(msg: String) -> void:
 	_toast_tween.tween_interval(2.5)
 	_toast_tween.tween_property(toast_panel, "modulate:a", 0.0, 0.5)
 
-func _on_level_completed(lvl_name: String, time_taken: float, final_score: int, is_final: bool) -> void:
+func _on_level_completed(lvl_name: String, time_taken: float, final_score: int, is_final: bool, rank_data: Dictionary = {}) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+	var rank_str: String = str(rank_data.get("rank", "A"))
+	var title_str: String = str(rank_data.get("rank_title", "TACTICAL OPERATOR"))
+	var time_bonus: int = int(rank_data.get("time_bonus", 0))
+	var health_bonus: int = int(rank_data.get("health_bonus", 0))
+	var base_score: int = int(rank_data.get("base_score", final_score))
+	var is_flawless: bool = bool(rank_data.get("is_flawless", false))
+	
+	var mins: int = int(time_taken / 60.0)
+	var secs: float = fmod(time_taken, 60.0)
+	var time_str := "%02d:%04.1f" % [mins, secs]
+	
+	var rank_color := Color(1.0, 0.85, 0.15) # S - Gold
+	match rank_str:
+		"S":
+			rank_color = Color(1.0, 0.85, 0.15)
+		"A":
+			rank_color = Color(0.2, 0.9, 1.0)
+		"B":
+			rank_color = Color(0.3, 0.95, 0.45)
+		"C":
+			rank_color = Color(0.9, 0.6, 0.3)
+			
+	var stats_text := "Time: %s (Bonus: +%d PTS)\nHealth Bonus: +%d PTS%s\nBase Score: %d PTS\n───────────────\nTOTAL SCORE: %d PTS" % [
+		time_str,
+		time_bonus,
+		health_bonus,
+		" ★ FLAWLESS!" if is_flawless else "",
+		base_score,
+		final_score
+	]
+	
 	if is_final:
 		victory_panel.visible = true
-		var mins: int = int(time_taken / 60.0)
-		var secs: float = fmod(time_taken, 60.0)
-		victory_stats.text = "ALL SECTORS SECURED!\n\nTotal Time: %02d:%04.1f\nFinal Score: %d PTS" % [mins, secs, final_score]
+		if victory_rank_letter:
+			victory_rank_letter.text = rank_str
+			victory_rank_letter.modulate = rank_color
+		if victory_rank_title:
+			victory_rank_title.text = title_str
+		victory_stats.text = "ALL SECTORS SECURED!\n\n" + stats_text
 		btn_victory_menu.grab_focus()
 	else:
 		level_clear_panel.visible = true
 		level_clear_title.text = "%s CLEARED!" % lvl_name.to_upper()
-		var mins: int = int(time_taken / 60.0)
-		var secs: float = fmod(time_taken, 60.0)
-		level_clear_stats.text = "Extraction Successful\nTime: %02d:%04.1f\nScore: %d PTS" % [mins, secs, final_score]
+		if rank_letter:
+			rank_letter.text = rank_str
+			rank_letter.modulate = rank_color
+			# Pop-in juice animation
+			rank_letter.scale = Vector2(0.2, 0.2)
+			rank_letter.pivot_offset = rank_letter.size * 0.5
+			var t := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			t.tween_property(rank_letter, "scale", Vector2.ONE, 0.4)
+		if rank_title:
+			rank_title.text = title_str
+		level_clear_stats.text = stats_text
 		btn_next_level.grab_focus()
 
 func _on_game_ended(won: bool) -> void:

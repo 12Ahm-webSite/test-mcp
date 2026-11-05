@@ -3,7 +3,7 @@ extends Node
 signal energy_updated(current: int, required: int)
 signal score_updated(score: int)
 signal toast_announced(message: String)
-signal level_completed(level_name: String, time_taken: float, score: int, is_final_level: bool)
+signal level_completed(level_name: String, time_taken: float, score: int, is_final_level: bool, rank_data: Dictionary)
 signal game_ended(won: bool)
 
 @export var level_id: String = "level_1"
@@ -85,6 +85,58 @@ func _activate_portal() -> void:
 		portal.activate()
 	toast_announced.emit("🌀 PORTAL ACTIVATED! Reach the extraction gate!")
 
+const LEVEL_PAR_TIMES := {
+	"level_1": 75.0,
+	"level_2": 95.0,
+	"level_3": 120.0
+}
+
+func calculate_rank(time_taken: float, score: int, health_val: float = 100.0, max_health_val: float = 100.0) -> Dictionary:
+	var par_time: float = float(LEVEL_PAR_TIMES.get(level_id, 90.0))
+	var time_ratio: float = time_taken / maxf(par_time, 1.0)
+	var health_ratio: float = clampf(health_val / maxf(max_health_val, 1.0), 0.0, 1.0)
+	var is_flawless: bool = health_ratio >= 0.99
+	
+	# Time Bonus: up to 1000 points if finished under par time
+	var time_bonus: int = 0
+	if time_ratio < 1.0:
+		time_bonus = int((1.0 - time_ratio) * 1000.0)
+	
+	# Health Bonus: up to 500 points based on health remaining
+	var health_bonus: int = int(health_ratio * 500.0)
+	if is_flawless:
+		health_bonus += 250 # Flawless extra bonus
+		
+	var total_score: int = score + time_bonus + health_bonus
+	
+	# Rank threshold calculation:
+	var rank := "C"
+	var title := "SURVIVOR"
+	
+	if (time_ratio <= 1.05 and health_ratio >= 0.75) or (is_flawless and time_ratio <= 1.35) or total_score >= 2200:
+		rank = "S"
+		title = "CHRONO MASTER" if not is_flawless else "FLAWLESS SPEEDRUNNER"
+	elif (time_ratio <= 1.35 and health_ratio >= 0.50) or total_score >= 1600:
+		rank = "A"
+		title = "ELITE RECON"
+	elif time_ratio <= 1.75 or health_ratio >= 0.25 or total_score >= 1000:
+		rank = "B"
+		title = "FIELD OPERATOR"
+	else:
+		rank = "C"
+		title = "SURVIVOR"
+		
+	return {
+		"rank": rank,
+		"rank_title": title,
+		"par_time": par_time,
+		"time_bonus": time_bonus,
+		"health_bonus": health_bonus,
+		"base_score": score,
+		"total_score": total_score,
+		"is_flawless": is_flawless
+	}
+
 func on_portal_reached() -> void:
 	if is_game_over or not is_portal_active:
 		return
@@ -96,12 +148,26 @@ func on_portal_reached() -> void:
 	# Stop entities
 	_freeze_actors()
 	
+	# Determine player health
+	var hp := 100.0
+	var max_hp := 100.0
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		if "health" in player:
+			hp = float(player.health)
+		if "max_health" in player:
+			max_hp = float(player.max_health)
+			
+	var rank_data := calculate_rank(elapsed_time, current_score, hp, max_hp)
+	var final_score: int = int(rank_data.get("total_score", current_score))
+	var final_rank: String = str(rank_data.get("rank", "B"))
+	
 	# Save progress
 	if save_mgr:
-		save_mgr.register_level_completion(level_id, current_score, elapsed_time)
+		save_mgr.register_level_completion(level_id, final_score, elapsed_time, final_rank)
 		
 	var is_final := (next_level_scene == "")
-	level_completed.emit(level_title, elapsed_time, current_score, is_final)
+	level_completed.emit(level_title, elapsed_time, final_score, is_final, rank_data)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func trigger_game_over(won: bool) -> void:

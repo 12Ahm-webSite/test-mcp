@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://ui/game_ui.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/mobile_touch_controls.tscn" id="2_touch"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp"]
 bg_color = Color(0.15, 0.85, 0.45, 0.9)
@@ -354,24 +355,42 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Modals/LevelClearPanel"]
-custom_minimum_size = Vector2(400, 260)
+custom_minimum_size = Vector2(440, 360)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal_win")
 
 [node name="VBox" type="VBoxContainer" parent="Modals/LevelClearPanel/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="Modals/LevelClearPanel/Panel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 text = "SECTOR 1 CLEARED!"
+horizontal_alignment = 1
+
+[node name="RankBadge" type="VBoxContainer" parent="Modals/LevelClearPanel/Panel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="RankLetter" type="Label" parent="Modals/LevelClearPanel/Panel/VBox/RankBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 46
+text = "S"
+horizontal_alignment = 1
+
+[node name="RankTitle" type="Label" parent="Modals/LevelClearPanel/Panel/VBox/RankBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "FLAWLESS OPERATOR"
 horizontal_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="Modals/LevelClearPanel/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "Extraction Successful
 Time: 01:23.4
 Score: 1250 PTS"
@@ -449,24 +468,42 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Modals/VictoryPanel"]
-custom_minimum_size = Vector2(440, 300)
+custom_minimum_size = Vector2(460, 380)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal_win")
 
 [node name="VBox" type="VBoxContainer" parent="Modals/VictoryPanel/Panel"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="Modals/VictoryPanel/Panel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 28
 text = "★ MISSION ACCOMPLISHED ★"
+horizontal_alignment = 1
+
+[node name="RankBadge" type="VBoxContainer" parent="Modals/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="RankLetter" type="Label" parent="Modals/VictoryPanel/Panel/VBox/RankBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 46
+text = "S"
+horizontal_alignment = 1
+
+[node name="RankTitle" type="Label" parent="Modals/VictoryPanel/Panel/VBox/RankBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "CHRONO MASTER"
 horizontal_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="Modals/VictoryPanel/Panel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 15
 text = "All 3 Sectors Restored!
 Central Reactor Stabilized."
 horizontal_alignment = 1
@@ -519,3 +556,5 @@ custom_minimum_size = Vector2(180, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Main Menu"
+
+[node name="MobileTouchControls" parent="." instance=ExtResource("2_touch")]
