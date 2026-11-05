@@ -240,3 +240,4 @@ jobs:
             - **🐧 Linux DEB:** `crystal-rush_1.0.0_amd64.deb` (Debian / Ubuntu / Linux Mint installer)
           draft: false
           prerelease: false
+
