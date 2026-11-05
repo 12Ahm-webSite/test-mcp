@@ -63,3 +63,4 @@ func _transition_to_menu() -> void:
 		)
 	else:
 		get_tree().change_scene_to_file(next_scene_path)
+
