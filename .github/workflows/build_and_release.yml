@@ -1,0 +1,242 @@
+name: Build Game (APK, EXE, DEB)
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # =================================================================
+  # 1. ANDROID EXPORT (APK)
+  # =================================================================
+  build-android:
+    name: Build Android (APK)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+
+      - name: Download Godot 4.7.2 & Export Templates
+        run: |
+          GODOT_RELEASE="4.7.2-stable"
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip
+          unzip -q Godot_v${GODOT_RELEASE}_linux.x86_64.zip
+          sudo mv Godot_v${GODOT_RELEASE}_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz
+          unzip -q Godot_v${GODOT_RELEASE}_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_RELEASE}
+          mv templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+
+      - name: Configure Godot Android Settings & Keystore
+        run: |
+          if [ ! -f debug.keystore ]; then
+            keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 -deststoretype pkcs12
+          fi
+
+          mkdir -p ~/.config/godot
+          cat << EOF > ~/.config/godot/editor_settings-4.7.tres
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/debug_keystore = "$GITHUB_WORKSPACE/debug.keystore"
+          export/android/debug_keystore_pass = "android"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+          cp ~/.config/godot/editor_settings-4.7.tres ~/.config/godot/editor_settings-4.tres
+
+      - name: Export APK
+        run: |
+          mkdir -p build/android
+          godot --headless --export-release "Android" build/android/Crystal_Rush.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Crystal_Rush_Android_APK
+          path: build/android/Crystal_Rush.apk
+
+  # =================================================================
+  # 2. WINDOWS EXPORT (EXE)
+  # =================================================================
+  build-windows:
+    name: Build Windows (EXE)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip zip
+
+      - name: Download Godot 4.7.2 & Export Templates
+        run: |
+          GODOT_RELEASE="4.7.2-stable"
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip
+          unzip -q Godot_v${GODOT_RELEASE}_linux.x86_64.zip
+          sudo mv Godot_v${GODOT_RELEASE}_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz
+          unzip -q Godot_v${GODOT_RELEASE}_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_RELEASE}
+          mv templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+
+      - name: Export Windows EXE
+        run: |
+          mkdir -p build/windows
+          godot --headless --export-release "Windows Desktop" build/windows/Crystal_Rush.exe
+          cd build/windows && zip -r ../../Crystal_Rush_Windows.zip . && cd ../..
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Crystal_Rush_Windows_EXE
+          path: Crystal_Rush_Windows.zip
+
+  # =================================================================
+  # 3. LINUX EXPORT (DEB PACKAGE)
+  # =================================================================
+  build-linux-deb:
+    name: Build Linux (DEB Package)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip dpkg
+
+      - name: Download Godot 4.7.2 & Export Templates
+        run: |
+          GODOT_RELEASE="4.7.2-stable"
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip
+          unzip -q Godot_v${GODOT_RELEASE}_linux.x86_64.zip
+          sudo mv Godot_v${GODOT_RELEASE}_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz
+          unzip -q Godot_v${GODOT_RELEASE}_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_RELEASE}
+          mv templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+
+      - name: Export Linux Binary
+        run: |
+          mkdir -p build/linux
+          godot --headless --export-release "Linux" build/linux/crystal-rush.x86_64
+          chmod +x build/linux/crystal-rush.x86_64
+
+      - name: Build Debian (.deb) Package
+        run: |
+          mkdir -p build/deb/DEBIAN
+          mkdir -p build/deb/usr/bin
+          mkdir -p build/deb/usr/share/crystal-rush
+          mkdir -p build/deb/usr/share/applications
+          mkdir -p build/deb/usr/share/icons/hicolor/scalable/apps
+
+          cp build/linux/crystal-rush.x86_64 build/deb/usr/share/crystal-rush/
+          chmod +x build/deb/usr/share/crystal-rush/crystal-rush.x86_64
+
+          cat << 'EOF' > build/deb/usr/bin/crystal-rush
+          #!/bin/sh
+          exec /usr/share/crystal-rush/crystal-rush.x86_64 "$@"
+          EOF
+          chmod +x build/deb/usr/bin/crystal-rush
+
+          cat << 'EOF' > build/deb/usr/share/applications/crystal-rush.desktop
+          [Desktop Entry]
+          Name=Crystal Rush
+          Comment=3D Low-Poly Sci-Fi Action Game
+          Exec=crystal-rush
+          Icon=crystal-rush
+          Terminal=false
+          Type=Application
+          Categories=Game;ActionGame;
+          EOF
+
+          cp icon.svg build/deb/usr/share/icons/hicolor/scalable/apps/crystal-rush.svg
+
+          cat << 'EOF' > build/deb/DEBIAN/control
+          Package: crystal-rush
+          Version: 1.0.0
+          Section: games
+          Priority: optional
+          Architecture: amd64
+          Maintainer: Crystal Rush Team <developer@example.com>
+          Description: Crystal Rush 3D Action Game
+           A fast-paced 3D Low-Poly Action & Adventure game developed in Godot 4.
+          EOF
+
+          dpkg-deb --build --root-owner-group build/deb build/crystal-rush_1.0.0_amd64.deb
+
+      - name: Upload Linux DEB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Crystal_Rush_Linux_DEB
+          path: build/crystal-rush_1.0.0_amd64.deb
+
+  # =================================================================
+  # 4. GITHUB RELEASE (WHEN TAGGED OR MANUALLY TRIGGERED)
+  # =================================================================
+  release:
+    name: Publish GitHub Release
+    needs: [build-android, build-windows, build-linux-deb]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_files
+
+      - name: Flatten Files
+        run: |
+          mkdir -p final_release
+          find release_files -type f -exec mv {} final_release/ \;
+          ls -lh final_release/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            final_release/Crystal_Rush.apk
+            final_release/Crystal_Rush_Windows.zip
+            final_release/crystal-rush_1.0.0_amd64.deb
+          tag_name: ${{ github.ref_name || 'v1.0.0' }}
+          name: Crystal Rush ${{ github.ref_name || 'v1.0.0' }}
+          body: |
+            ### 🎮 Crystal Rush — Official Builds
+            
+            Multi-platform releases compiled automatically with Godot 4.7.2:
+            - **📱 Android APK:** `Crystal_Rush.apk`
+            - **💻 Windows EXE:** `Crystal_Rush_Windows.zip` (includes standalone executable)
+            - **🐧 Linux DEB:** `crystal-rush_1.0.0_amd64.deb` (Debian / Ubuntu / Linux Mint installer)
+          draft: false
+          prerelease: false
