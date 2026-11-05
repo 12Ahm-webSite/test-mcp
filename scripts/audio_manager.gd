@@ -15,6 +15,9 @@ var _explosion_sfx: AudioStreamWAV = null
 var _hit_sfx: AudioStreamWAV = null
 var _pickup_weapon_sfx: AudioStreamWAV = null
 var _medkit_sfx: AudioStreamWAV = null
+var _drone_laser_sfx: AudioStreamWAV = null
+var _drone_alert_sfx: AudioStreamWAV = null
+var _datapad_sfx: AudioStreamWAV = null
 
 var _players: Array[AudioStreamPlayer] = []
 const MAX_PLAYERS := 8
@@ -61,6 +64,9 @@ func _generate_all_sfx() -> void:
 	_hit_sfx = _gen_harmonic(220.0, 0.12)
 	_pickup_weapon_sfx = _gen_chime(440.0, 880.0, 0.16)
 	_medkit_sfx = _gen_trill(330.0, 660.0, 0.24)
+	_drone_laser_sfx = _gen_sweep(1200.0, 400.0, 0.09)
+	_drone_alert_sfx = _gen_trill(880.0, 1760.0, 0.22)
+	_datapad_sfx = _gen_chord(0.3)
 
 func play_sfx(stream: AudioStreamWAV, volume_db: float = 0.0) -> void:
 	if not stream or _players.is_empty():
@@ -110,6 +116,15 @@ func play_weapon_pickup() -> void:
 
 func play_medkit() -> void:
 	play_sfx(_medkit_sfx, 1.0)
+
+func play_drone_laser() -> void:
+	play_sfx(_drone_laser_sfx, -2.0)
+
+func play_drone_alert() -> void:
+	play_sfx(_drone_alert_sfx, 1.0)
+
+func play_datapad() -> void:
+	play_sfx(_datapad_sfx, 1.0)
 
 # --- Procedural Audio Synthesizers (16-bit PCM Mono 22050Hz) ---
 

@@ -15,6 +15,8 @@
 [ext_resource type="PackedScene" path="res://ui/game_ui.tscn" id="13_ui"]
 [ext_resource type="PackedScene" path="res://scenes/vfx_ambient_motes.tscn" id="14_motes"]
 [ext_resource type="PackedScene" path="res://assets/models/grass.glb" id="16_grass_model"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_drone.tscn" id="17_drone"]
+[ext_resource type="PackedScene" path="res://scenes/lore_datapad.tscn" id="18_datapad"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.28, 0.6, 0.95, 1)
@@ -170,6 +172,15 @@ transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, -36)
 [node name="DistantRuinSouth" parent="Architecture" instance=ExtResource("8_arch")]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, 36)
 
+[node name="SecretPlatform1" parent="Architecture" instance=ExtResource("10_platform")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -16, 2.8, -14)
+
+[node name="SecretPlatform2" parent="Architecture" instance=ExtResource("10_platform")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -19, 4.6, -18)
+
+[node name="SecretSanctuary" parent="Architecture" instance=ExtResource("10_platform")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, -20, 6.2, -22)
+
 [node name="Foliage" type="Node3D" parent="." unique_id=1851595371]
 
 [node name="Tree1" parent="Foliage" unique_id=662595861 instance=ExtResource("11_tree")]
@@ -252,9 +263,22 @@ crystal_type = 2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -3)
 crystal_type = 3
 
+[node name="SecretRareCrystal" parent="Crystals" instance=ExtResource("6_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 7.4, -22)
+crystal_type = 3
+
 [node name="Enemy" parent="." unique_id=993948270 instance=ExtResource("5_enemy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -5)
 patrol_speed = 3.8
+
+[node name="EnemyDrone" parent="." instance=ExtResource("17_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.2, 5)
+
+[node name="LoreDatapad1" parent="." instance=ExtResource("18_datapad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 6.2, -22)
+archive_id = "DATA-01"
+archive_title = "Sunken Sector Archives"
+lore_text = "The ancient builders used these crystals to power the Great Aegis before the robotic sentinels went rogue..."
 
 [node name="Player" parent="." unique_id=568159098 instance=ExtResource("4_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 18)

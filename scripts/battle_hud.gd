@@ -39,7 +39,50 @@ func _process(_delta: float) -> void:
 				crosshair_label.text = "+"
 				crosshair_label.modulate = Color(1.0, 1.0, 1.0, 0.75)
 
+func _ensure_nodes() -> void:
+	if not quota_label:
+		quota_label = get_node_or_null("TopCenter/Panel/VBox/QuotaLabel")
+	if not sector_title_label:
+		sector_title_label = get_node_or_null("TopCenter/Panel/VBox/SectorTitle")
+	if not leader_label:
+		leader_label = get_node_or_null("TopCenter/Panel/VBox/LeaderLabel")
+	if not health_bar:
+		health_bar = get_node_or_null("BottomLeft/VBox/HealthBar")
+	if not health_label:
+		health_label = get_node_or_null("BottomLeft/VBox/HealthBar/Label")
+	if not shield_label:
+		shield_label = get_node_or_null("BottomLeft/VBox/ShieldLabel")
+	if not slot_1:
+		slot_1 = get_node_or_null("BottomRight/HBox/Slot1")
+	if not slot_2:
+		slot_2 = get_node_or_null("BottomRight/HBox/Slot2")
+	if not slot_3:
+		slot_3 = get_node_or_null("BottomRight/HBox/Slot3")
+	if not ammo_1:
+		ammo_1 = get_node_or_null("BottomRight/HBox/Slot1/VBox/Ammo")
+	if not ammo_2:
+		ammo_2 = get_node_or_null("BottomRight/HBox/Slot2/VBox/Ammo")
+	if not ammo_3:
+		ammo_3 = get_node_or_null("BottomRight/HBox/Slot3/VBox/Ammo")
+	if not killfeed_container:
+		killfeed_container = get_node_or_null("TopRight/KillfeedContainer")
+	if not alert_banner:
+		alert_banner = get_node_or_null("CenterAlert/AlertBanner")
+	if not end_screen:
+		end_screen = get_node_or_null("EndScreen")
+	if not end_title and end_screen:
+		end_title = get_node_or_null("EndScreen/VBox/Title")
+	if not end_subtitle and end_screen:
+		end_subtitle = get_node_or_null("EndScreen/VBox/Subtitle")
+	if not btn_restart and end_screen:
+		btn_restart = get_node_or_null("EndScreen/VBox/HBox/BtnRestart")
+	if not btn_menu and end_screen:
+		btn_menu = get_node_or_null("EndScreen/VBox/HBox/BtnMenu")
+	if not crosshair_label:
+		crosshair_label = get_node_or_null("Crosshair/Label")
+
 func _ready() -> void:
+	_ensure_nodes()
 	if alert_banner:
 		alert_banner.modulate.a = 0.0
 	if end_screen:
@@ -53,6 +96,7 @@ func _ready() -> void:
 	call_deferred("_connect_signals")
 
 func _connect_signals() -> void:
+	_ensure_nodes()
 	var tree := get_tree() if is_inside_tree() else null
 	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
 	if not bm:
@@ -129,6 +173,7 @@ func _on_ammo_updated(type: int, current_ammo: int) -> void:
 			if ammo_3: ammo_3.text = str(current_ammo)
 
 func _on_quota_updated(player_kills: int, quota: int, s_title: String) -> void:
+	_ensure_nodes()
 	if sector_title_label:
 		sector_title_label.text = s_title
 	if quota_label:
@@ -166,12 +211,13 @@ func _on_killfeed_event(killer: String, victim: String, icon: String) -> void:
 		oldest.queue_free()
 		
 	# Fade out after 4 seconds
-	get_tree().create_timer(4.0).timeout.connect(func():
-		if is_instance_valid(entry):
-			var tw := entry.create_tween()
-			tw.tween_property(entry, "modulate:a", 0.0, 0.5)
-			tw.tween_callback(entry.queue_free)
-	)
+	if is_inside_tree() and get_tree():
+		get_tree().create_timer(4.0).timeout.connect(func():
+			if is_instance_valid(entry):
+				var tw := entry.create_tween()
+				tw.tween_property(entry, "modulate:a", 0.0, 0.5)
+				tw.tween_callback(entry.queue_free)
+		)
 
 func _on_alliance_event(message: String, is_positive: bool) -> void:
 	if not alert_banner:

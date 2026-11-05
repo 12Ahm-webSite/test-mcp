@@ -19,6 +19,8 @@ enum State {
 @export var view_angle_deg: float = 110.0
 @export var hearing_distance: float = 12.0
 @export var gravity: float = 19.6
+@export var attack_damage: float = 35.0
+@export var attack_cooldown: float = 1.4
 
 var current_state: State = State.PATROL
 var is_active: bool = true
@@ -30,8 +32,15 @@ var _search_timer: float = 0.0
 var _stagger_timer: float = 0.0
 var _patrol_target: Vector3 = Vector3.ZERO
 var _patrol_timer: float = 0.0
+var _hit_cooldown_timer: float = 0.0
 var _hiding_zones: Dictionary = {} # zone_key -> count
 var _player: Node3D = null
+
+# Anti-stuck & Navigation state
+var _last_pos: Vector3 = Vector3.ZERO
+var _stuck_timer: float = 0.0
+var _unstick_timer: float = 0.0
+var _unstick_dir: Vector3 = Vector3.ZERO
 
 # Node references
 @onready var model: Node3D = $Model
@@ -46,16 +55,25 @@ var _player: Node3D = null
 var _anim_time: float = 0.0
 var _base_model_y: float = 1.0
 
+func _get_pos() -> Vector3:
+	return global_position if is_inside_tree() else position
+
 func _ready() -> void:
 	add_to_group("enemy")
-	patrol_origin = global_position
+	patrol_origin = _get_pos()
+	_last_pos = _get_pos()
 	_pick_new_patrol_target()
 	_find_player()
 
 func _find_player() -> void:
-	_player = get_tree().get_first_node_in_group("player")
+	var tree := get_tree() if is_inside_tree() else null
+	if tree:
+		_player = tree.get_first_node_in_group("player")
 
 func _physics_process(delta: float) -> void:
+	if _hit_cooldown_timer > 0.0:
+		_hit_cooldown_timer -= delta
+
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	else:
@@ -225,30 +243,78 @@ func _process_staggered(delta: float) -> void:
 # NAVIGATION & STEERING
 # ----------------------------------------------------
 func _move_towards(target_pos: Vector3, move_speed: float, delta: float) -> void:
-	var to_target := target_pos - global_position
+	var to_target := target_pos - _get_pos()
 	to_target.y = 0.0
+	var dist := to_target.length()
 	
-	if to_target.length() < 0.1:
-		velocity.x = move_toward(velocity.x, 0.0, 8.0 * delta)
-		velocity.z = move_toward(velocity.z, 0.0, 8.0 * delta)
+	if dist < 0.2:
+		velocity.x = move_toward(velocity.x, 0.0, 10.0 * delta)
+		velocity.z = move_toward(velocity.z, 0.0, 10.0 * delta)
 		return
 
-	var steer_dir := to_target.normalized()
+	# Handle active unstick maneuver
+	if _unstick_timer > 0.0:
+		_unstick_timer -= delta
+		velocity.x = _unstick_dir.x * move_speed
+		velocity.z = _unstick_dir.z * move_speed
+		var unstick_angle := atan2(-_unstick_dir.x, -_unstick_dir.z)
+		rotation.y = lerp_angle(rotation.y, unstick_angle, turn_speed * delta)
+		return
 
-	# Obstacle avoidance with whiskers
+	var desired_dir := to_target.normalized()
+	var avoidance := Vector3.ZERO
+
+	# Smooth obstacle avoidance with collision normals
 	if ray_forward and ray_forward.is_colliding():
-		if ray_left and not ray_left.is_colliding():
-			steer_dir = steer_dir.rotated(Vector3.UP, deg_to_rad(45.0))
-		elif ray_right and not ray_right.is_colliding():
-			steer_dir = steer_dir.rotated(Vector3.UP, deg_to_rad(-45.0))
+		var norm = ray_forward.get_collision_normal()
+		norm.y = 0.0
+		if norm.length_squared() > 0.01:
+			avoidance += norm.normalized() * 2.2
 		else:
-			steer_dir = steer_dir.rotated(Vector3.UP, deg_to_rad(90.0))
+			avoidance += -desired_dir * 1.5
 
-	velocity.x = steer_dir.x * move_speed
-	velocity.z = steer_dir.z * move_speed
+	if ray_left and ray_left.is_colliding():
+		var norm = ray_left.get_collision_normal()
+		norm.y = 0.0
+		if norm.length_squared() > 0.01:
+			avoidance += norm.normalized() * 1.4
+		else:
+			avoidance += global_transform.basis.x * 1.4
 
-	var target_angle := atan2(-steer_dir.x, -steer_dir.z)
+	if ray_right and ray_right.is_colliding():
+		var norm = ray_right.get_collision_normal()
+		norm.y = 0.0
+		if norm.length_squared() > 0.01:
+			avoidance += norm.normalized() * 1.4
+		else:
+			avoidance += -global_transform.basis.x * 1.4
+
+	var final_dir: Vector3
+	if avoidance.length_squared() > 0.01:
+		final_dir = (desired_dir + avoidance).normalized()
+	else:
+		final_dir = desired_dir
+
+	velocity.x = move_toward(velocity.x, final_dir.x * move_speed, 12.0 * delta)
+	velocity.z = move_toward(velocity.z, final_dir.z * move_speed, 12.0 * delta)
+
+	var target_angle := atan2(-final_dir.x, -final_dir.z)
 	rotation.y = lerp_angle(rotation.y, target_angle, turn_speed * delta)
+
+	# Anti-stuck detection: monitor physical displacement
+	if move_speed > 1.0:
+		var moved_dist := _get_pos().distance_to(_last_pos)
+		if moved_dist < 0.05:
+			_stuck_timer += delta
+			if _stuck_timer > 0.45:
+				_stuck_timer = 0.0
+				_unstick_timer = 0.6
+				var right_vec := final_dir.cross(Vector3.UP).normalized()
+				var side := 1.0 if randf() > 0.5 else -1.0
+				_unstick_dir = (-final_dir * 0.5 + right_vec * side * 0.85).normalized()
+		else:
+			_stuck_timer = maxf(0.0, _stuck_timer - delta * 2.0)
+	_last_pos = _get_pos()
 
 func _enter_state(new_state: State) -> void:
 	current_state = new_state
@@ -260,7 +326,8 @@ func _enter_state(new_state: State) -> void:
 				eye_light.light_color = Color(1.0, 0.0, 0.0)
 				eye_light.light_energy = 4.0
 				eye_light.omni_range = 7.0
-			var audio = get_tree().get_first_node_in_group("audio_manager")
+			var tree := get_tree() if is_inside_tree() else null
+			var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 			if audio and audio.has_method("play_alert"):
 				audio.play_alert()
 		State.SEARCH:
@@ -276,23 +343,47 @@ func _enter_state(new_state: State) -> void:
 				eye_light.light_energy = 2.0
 				eye_light.omni_range = 5.0
 		State.STAGGERED:
-			_stagger_timer = 1.6
+			_stagger_timer = 2.0
 			if eye_light:
-				eye_light.light_energy = 0.5
+				eye_light.light_color = Color(1.0, 0.65, 0.1) # Amber glitch
+				eye_light.light_energy = 0.6
 
 func _attempt_catch() -> void:
-	if _player and "take_hit" in _player:
-		var fatal: bool = _player.take_hit()
+	if _hit_cooldown_timer > 0.0:
+		return
+	_hit_cooldown_timer = attack_cooldown
+
+	if _player and _player.has_method("take_hit"):
+		var fatal: bool = _player.take_hit(attack_damage, self)
 		if not fatal:
-			# Shield absorbed the attack! Sentinel is staggered
+			# Player survived with partial damage or shield! Sentinel is staggered
 			_enter_state(State.STAGGERED)
 			return
+		else:
+			# Fatal catch -> Player health reached zero
+			is_active = false
+			return
 
-	# Fatal catch -> Trigger Game Over
-	is_active = false
-	var gm = get_tree().get_first_node_in_group("game_manager")
-	if gm and gm.has_method("trigger_game_over"):
-		gm.trigger_game_over(false)
+func take_damage(amount: float, attacker: Node3D = null) -> void:
+	if not is_active:
+		return
+	# Tactical player agency: shooting the Sentinel interrupts its chase and stuns it for 2.0s!
+	_stagger_timer = 2.0
+	_enter_state(State.STAGGERED)
+	if eye_light:
+		eye_light.light_color = Color(1.0, 0.9, 0.2)
+		eye_light.light_energy = 5.0
+	var tree := get_tree() if is_inside_tree() else null
+	var audio = tree.get_first_node_in_group("audio_manager") if tree else null
+	if audio and audio.has_method("play_hit"):
+		audio.play_hit()
+
+func receive_alert(target_pos: Vector3) -> void:
+	if not is_active:
+		return
+	last_seen_position = target_pos
+	if current_state == State.PATROL or current_state == State.RETURN:
+		_enter_state(State.SEARCH)
 
 # ----------------------------------------------------
 # ADAPTATION & PATROL HELPERS

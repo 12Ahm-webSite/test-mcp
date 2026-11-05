@@ -18,8 +18,10 @@ var _lifetime: float = 0.0
 @onready var light: OmniLight3D = $OmniLight3D
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
-	area_entered.connect(_on_area_entered)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
+	if not area_entered.is_connected(_on_area_entered):
+		area_entered.connect(_on_area_entered)
 
 func setup(p_shooter: Node3D, p_direction: Vector3, p_weapon: Dictionary) -> void:
 	shooter = p_shooter
@@ -84,11 +86,36 @@ func _on_body_entered(body: Node3D) -> void:
 	# Direct hit
 	if body.has_method("take_damage"):
 		body.take_damage(damage, shooter)
-		var audio = get_tree().get_first_node_in_group("audio_manager")
+		var tree := get_tree() if is_inside_tree() else null
+		var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 		if audio and audio.has_method("play_hit"):
 			audio.play_hit()
+			
+		# Impact juice: Hit-Stop and Camera Punch if player fired the shot
+		if shooter and (shooter.is_in_group("player") or shooter.name.begins_with("Player")):
+			if shooter.has_method("trigger_hit_stop"):
+				shooter.trigger_hit_stop(0.04, 0.15)
+			else:
+				_trigger_hit_stop(0.04, 0.15)
+			if shooter.has_method("add_camera_shake"):
+				shooter.add_camera_shake(0.25)
 	
 	_spawn_spark_and_free()
+
+func _trigger_hit_stop(duration: float = 0.04, time_scale_val: float = 0.15) -> void:
+	var tree := get_tree() if is_inside_tree() else (shooter.get_tree() if (shooter and shooter.is_inside_tree()) else null)
+	if not tree:
+		var ml = Engine.get_main_loop()
+		if ml is SceneTree:
+			tree = ml as SceneTree
+	Engine.time_scale = time_scale_val
+	if tree:
+		# Use timer signal with CONNECT_ONE_SHOT so projectile queue_free() cannot cancel the restoration
+		tree.create_timer(duration, true, false, true).timeout.connect(func():
+			Engine.time_scale = 1.0
+		, CONNECT_ONE_SHOT)
+	else:
+		Engine.time_scale = 1.0
 
 func _on_area_entered(area: Area3D) -> void:
 	if area == self or area == shooter:
@@ -102,12 +129,13 @@ func _explode() -> void:
 	set_deferred("monitorable", false)
 	
 	# Audio
-	var audio = get_tree().get_first_node_in_group("audio_manager")
+	var tree := get_tree() if is_inside_tree() else null
+	var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 	if audio and audio.has_method("play_explosion"):
 		audio.play_explosion()
 		
 	# Screen shake if near player
-	var player = get_tree().get_first_node_in_group("player")
+	var player = tree.get_first_node_in_group("player") if tree else null
 	if player and player.has_method("add_camera_shake"):
 		var dist: float = global_position.distance_to(player.global_position)
 		if dist < 18.0:
@@ -136,7 +164,16 @@ func _explode() -> void:
 	queue_free()
 
 func _spawn_spark_and_free() -> void:
-	# Subtle spark mesh/effect before free
+	if is_inside_tree() and get_parent():
+		var spark := OmniLight3D.new()
+		spark.light_color = Color(1.0, 0.92, 0.5)
+		spark.light_energy = 3.5
+		spark.omni_range = 2.2
+		get_parent().add_child(spark)
+		spark.global_position = global_position
+		var tw := spark.create_tween()
+		tw.tween_property(spark, "light_energy", 0.0, 0.08)
+		tw.tween_callback(spark.queue_free)
 	queue_free()
 
 func _spawn_explosion_vfx() -> void:

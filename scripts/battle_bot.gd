@@ -48,6 +48,12 @@ var _has_nav_target: bool = false
 var has_shield: bool = false
 var speed_boost_factor: float = 1.0
 
+# Anti-stuck & obstacle navigation
+var _last_pos: Vector3 = Vector3.ZERO
+var _stuck_timer: float = 0.0
+var _unstick_timer: float = 0.0
+var _unstick_dir: Vector3 = Vector3.ZERO
+
 # Node references
 @onready var model: Node3D = $Model
 @onready var weapon_mount: Node3D = $Model/WeaponMount if has_node("Model/WeaponMount") else null
@@ -60,16 +66,24 @@ var speed_boost_factor: float = 1.0
 @onready var ray_obstacle_left: RayCast3D = $RayObstacleLeft
 @onready var ray_obstacle_right: RayCast3D = $RayObstacleRight
 
+func _get_safe_tree() -> SceneTree:
+	return get_tree() if is_inside_tree() else null
+
+func _get_pos() -> Vector3:
+	return global_position if is_inside_tree() else position
+
 func _ready() -> void:
 	add_to_group("battle_bot")
 	add_to_group("combatant")
+	_last_pos = _get_pos()
 	_apply_difficulty()
 	_update_billboard()
 	_update_weapon_models()
 	_pick_new_roam_target()
 
 func _apply_difficulty() -> void:
-	var bm = get_tree().get_first_node_in_group("battle_manager")
+	var tree := _get_safe_tree()
+	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
 	if bm and bm.has_method("get_difficulty_params"):
 		var p: Dictionary = bm.get_difficulty_params()
 		max_health = p.get("bot_max_health", 65.0)
@@ -129,10 +143,11 @@ func _evaluate_ai_state() -> void:
 			return
 			
 	# Check Alliance opportunity with Leader
-	var bm = get_tree().get_first_node_in_group("battle_manager")
+	var tree := _get_safe_tree()
+	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
 	if bm and bm.has_method("get_leader"):
 		var leader: Node3D = bm.get_leader()
-		var player = get_tree().get_first_node_in_group("player")
+		var player = tree.get_first_node_in_group("player") if tree else null
 		
 		# If leader pulled ahead (>=2 kills lead), check if we team up
 		if leader and leader != self:
@@ -171,13 +186,17 @@ func _evaluate_ai_state() -> void:
 func _find_best_target() -> Node3D:
 	var candidates: Array[Node3D] = []
 	
+	var tree := _get_safe_tree()
+	if not tree:
+		return null
+		
 	# Add player if not allied
-	var player = get_tree().get_first_node_in_group("player")
+	var player = tree.get_first_node_in_group("player")
 	if player and not is_allied_with_player and not ("is_dead" in player and player.is_dead):
 		candidates.append(player)
 		
 	# Add other bots
-	var all_bots = get_tree().get_nodes_in_group("battle_bot")
+	var all_bots = tree.get_nodes_in_group("battle_bot")
 	for b in all_bots:
 		var bot = b as BattleBot
 		if bot and bot != self and not bot.is_dead:
@@ -261,19 +280,68 @@ func _move_towards(target_pt: Vector3, speed: float, delta: float) -> void:
 	_apply_movement_with_avoidance(dir, speed, delta)
 
 func _apply_movement_with_avoidance(desired_dir: Vector3, speed: float, delta: float) -> void:
+	# Active unstick maneuver
+	if _unstick_timer > 0.0:
+		_unstick_timer -= delta
+		velocity.x = _unstick_dir.x * speed * speed_boost_factor
+		velocity.z = _unstick_dir.z * speed * speed_boost_factor
+		var unstick_rot := atan2(-_unstick_dir.x, -_unstick_dir.z)
+		model.rotation.y = lerp_angle(model.rotation.y, unstick_rot, 10.0 * delta)
+		return
+
 	var final_dir := desired_dir
+	var avoidance := Vector3.ZERO
 	
-	# Raycast obstacle steering
+	# Raycast obstacle steering with collision normals
 	if ray_obstacle_center and ray_obstacle_center.is_colliding():
-		if ray_obstacle_left and not ray_obstacle_left.is_colliding():
-			final_dir = (desired_dir + -model.global_transform.basis.x * 1.5).normalized()
+		var norm = ray_obstacle_center.get_collision_normal()
+		norm.y = 0.0
+		if norm.length_squared() > 0.01:
+			avoidance += norm.normalized() * 2.2
+		elif ray_obstacle_left and not ray_obstacle_left.is_colliding():
+			avoidance += -model.global_transform.basis.x * 1.5
 		elif ray_obstacle_right and not ray_obstacle_right.is_colliding():
-			final_dir = (desired_dir + model.global_transform.basis.x * 1.5).normalized()
+			avoidance += model.global_transform.basis.x * 1.5
 		else:
-			final_dir = -desired_dir
+			avoidance += -desired_dir * 1.5
+			
+	if ray_obstacle_left and ray_obstacle_left.is_colliding():
+		var norm = ray_obstacle_left.get_collision_normal()
+		norm.y = 0.0
+		if norm.length_squared() > 0.01:
+			avoidance += norm.normalized() * 1.4
+		else:
+			avoidance += model.global_transform.basis.x * 1.4
+
+	if ray_obstacle_right and ray_obstacle_right.is_colliding():
+		var norm = ray_obstacle_right.get_collision_normal()
+		norm.y = 0.0
+		if norm.length_squared() > 0.01:
+			avoidance += norm.normalized() * 1.4
+		else:
+			avoidance += -model.global_transform.basis.x * 1.4
+
+	if avoidance.length_squared() > 0.01:
+		final_dir = (desired_dir + avoidance).normalized()
 			
 	velocity.x = move_toward(velocity.x, final_dir.x * speed * speed_boost_factor, 14.0 * delta)
 	velocity.z = move_toward(velocity.z, final_dir.z * speed * speed_boost_factor, 14.0 * delta)
+
+	# Anti-stuck detection: monitor physical displacement
+	if speed > 1.0 and desired_dir.length_squared() > 0.01:
+		var curr_pos := _get_pos()
+		var moved_dist := curr_pos.distance_to(_last_pos)
+		if moved_dist < 0.05:
+			_stuck_timer += delta
+			if _stuck_timer > 0.45:
+				_stuck_timer = 0.0
+				_unstick_timer = 0.6
+				var right_vec := final_dir.cross(Vector3.UP).normalized()
+				var side := 1.0 if randf() > 0.5 else -1.0
+				_unstick_dir = (-final_dir * 0.5 + right_vec * side * 0.85).normalized()
+		else:
+			_stuck_timer = maxf(0.0, _stuck_timer - delta * 2.0)
+	_last_pos = _get_pos()
 
 func _has_line_of_sight(target: Node3D) -> bool:
 	var space := get_world_3d().direct_space_state
@@ -290,7 +358,8 @@ func _try_bot_shoot(target_pos: Vector3) -> void:
 		return
 		
 	var w_data: Dictionary = WeaponData.get_weapon(current_weapon).duplicate()
-	var bm = get_tree().get_first_node_in_group("battle_manager")
+	var tree := _get_safe_tree()
+	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
 	var bot_dmg: float = 8.0
 	if bm and bm.has_method("get_difficulty_params"):
 		bot_dmg = bm.get_difficulty_params().get("bot_damage", 8.0)
@@ -313,14 +382,15 @@ func _try_bot_shoot(target_pos: Vector3) -> void:
 	proj.setup(self, shoot_dir, w_data)
 	
 	# Audio & Muzzle flash
-	var audio = get_tree().get_first_node_in_group("audio_manager")
+	var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 	var sfx_name: String = w_data.get("sfx_method", "play_pistol")
 	if audio and audio.has_method(sfx_name):
 		audio.call(sfx_name)
 		
 	if muzzle_flash:
 		muzzle_flash.visible = true
-		get_tree().create_timer(0.04).timeout.connect(func(): if muzzle_flash: muzzle_flash.visible = false)
+		if tree:
+			tree.create_timer(0.04).timeout.connect(func(): if muzzle_flash: muzzle_flash.visible = false)
 
 func take_damage(amount: float, attacker: Node3D = null) -> void:
 	if is_dead:
@@ -471,7 +541,8 @@ func _update_weapon_models() -> void:
 		smg_model.visible = (current_weapon == WeaponData.WeaponType.SMG)
 
 func _pick_new_roam_target() -> void:
-	var bm = get_tree().get_first_node_in_group("battle_manager")
+	var tree := _get_safe_tree()
+	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
 	if bm and bm.has_method("get_random_waypoint"):
 		_nav_target_pos = bm.get_random_waypoint()
 	else:
@@ -479,7 +550,8 @@ func _pick_new_roam_target() -> void:
 	_has_nav_target = true
 
 func _find_nearest_pickup(pickup_type: int) -> Node3D:
-	var pickups = get_tree().get_nodes_in_group("pickups")
+	var tree := _get_safe_tree()
+	var pickups = tree.get_nodes_in_group("pickups") if tree else []
 	var nearest: Node3D = null
 	var min_dist: float = 9999.0
 	for p in pickups:
@@ -494,14 +566,18 @@ func _find_nearest_pickup(pickup_type: int) -> Node3D:
 # Buff hooks
 func activate_shield(duration: float = 12.0) -> void:
 	has_shield = true
-	var timer := get_tree().create_timer(duration)
-	await timer.timeout
+	var tree := _get_safe_tree()
+	if tree:
+		var timer := tree.create_timer(duration)
+		await timer.timeout
 	if is_instance_valid(self):
 		has_shield = false
 
 func activate_speed_boost(multiplier: float = 1.45, duration: float = 8.0) -> void:
 	speed_boost_factor = multiplier
-	var timer := get_tree().create_timer(duration)
-	await timer.timeout
+	var tree := _get_safe_tree()
+	if tree:
+		var timer := tree.create_timer(duration)
+		await timer.timeout
 	if is_instance_valid(self):
 		speed_boost_factor = 1.0

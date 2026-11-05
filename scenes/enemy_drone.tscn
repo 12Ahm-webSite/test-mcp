@@ -1,0 +1,105 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_drone.gd" id="1_script"]
+[ext_resource type="Material" path="res://assets/materials/mat_enemy_body.tres" id="2_body_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_enemy_eye.tres" id="3_eye_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_neon_accent.tres" id="4_neon_mat"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_drone"]
+radius = 0.55
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_chassis"]
+material = ExtResource("2_body_mat")
+top_radius = 0.45
+bottom_radius = 0.38
+height = 0.22
+radial_segments = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_eye"]
+material = ExtResource("3_eye_mat")
+size = Vector3(0.3, 0.12, 0.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wing"]
+material = ExtResource("2_body_mat")
+size = Vector3(0.55, 0.04, 0.26)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_thruster"]
+material = ExtResource("4_neon_mat")
+top_radius = 0.08
+bottom_radius = 0.12
+height = 0.25
+radial_segments = 6
+
+[node name="EnemyDrone" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_drone")
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="Chassis" type="MeshInstance3D" parent="Model"]
+mesh = SubResource("CylinderMesh_chassis")
+
+[node name="ScannerEye" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.38)
+mesh = SubResource("BoxMesh_eye")
+
+[node name="EyeLight" type="OmniLight3D" parent="Model/ScannerEye"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
+light_color = Color(0.1, 0.9, 1, 1)
+light_energy = 2.5
+omni_range = 5.0
+
+[node name="WingL" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, -0.52, 0.05, 0)
+mesh = SubResource("BoxMesh_wing")
+
+[node name="WingR" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, 0, 1, 0.52, 0.05, 0)
+mesh = SubResource("BoxMesh_wing")
+
+[node name="ThrusterL" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, -0.4, 0, 0.28)
+mesh = SubResource("CylinderMesh_thruster")
+
+[node name="Light" type="OmniLight3D" parent="Model/ThrusterL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+light_color = Color(0.15, 0.75, 1, 1)
+light_energy = 2.0
+omni_range = 2.5
+
+[node name="ThrusterR" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0.4, 0, 0.28)
+mesh = SubResource("CylinderMesh_thruster")
+
+[node name="Light" type="OmniLight3D" parent="Model/ThrusterR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+light_color = Color(0.15, 0.75, 1, 1)
+light_energy = 2.0
+omni_range = 2.5
+
+[node name="MuzzleL" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.32, -0.08, -0.42)
+
+[node name="MuzzleR" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, -0.08, -0.42)
+
+[node name="RayCastDown" type="RayCast3D" parent="."]
+target_position = Vector3(0, -10, 0)
+collision_mask = 1
+
+[node name="RayCastForward" type="RayCast3D" parent="."]
+target_position = Vector3(0, 0, -3.5)
+collision_mask = 1
+
+[node name="RayCastLeft" type="RayCast3D" parent="."]
+target_position = Vector3(-2.5, 0, -2)
+collision_mask = 1
+
+[node name="RayCastRight" type="RayCast3D" parent="."]
+target_position = Vector3(2.5, 0, -2)
+collision_mask = 1
+

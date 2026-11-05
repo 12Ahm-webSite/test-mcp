@@ -29,8 +29,12 @@ const MAT_SHIELD := preload("res://assets/materials/mat_crystal_shield.tres")
 const MAT_RARE := preload("res://assets/materials/mat_crystal_rare.tres")
 
 func _ready() -> void:
+	add_to_group("crystals")
+	if crystal_type == CrystalType.ENERGY:
+		add_to_group("energy_crystals")
 	_base_y = position.y
-	body_entered.connect(_on_body_entered)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
 	_apply_visuals()
 
 func _apply_visuals() -> void:
@@ -75,6 +79,8 @@ func _on_body_entered(body: Node3D) -> void:
 		
 	if player:
 		_is_collected = true
+		remove_from_group("crystals")
+		remove_from_group("energy_crystals")
 		set_deferred("monitoring", false)
 		set_deferred("monitorable", false)
 		

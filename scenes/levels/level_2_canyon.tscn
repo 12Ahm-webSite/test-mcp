@@ -13,6 +13,9 @@
 [ext_resource type="PackedScene" path="res://scenes/prop_rock.tscn" id="11_rock"]
 [ext_resource type="PackedScene" path="res://ui/game_ui.tscn" id="12_ui"]
 [ext_resource type="PackedScene" path="res://scenes/vfx_ambient_motes.tscn" id="13_motes"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_drone.tscn" id="14_drone"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_brute.tscn" id="15_brute"]
+[ext_resource type="PackedScene" path="res://scenes/lore_datapad.tscn" id="16_datapad"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twilight"]
 sky_top_color = Color(0.2, 0.12, 0.38, 1)
@@ -160,6 +163,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.8, -4)
 [node name="PlatStep4" parent="Architecture" unique_id=1534936675 instance=ExtResource("10_platform")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.8, -2)
 
+[node name="CanyonSecretStep1" parent="Architecture" instance=ExtResource("10_platform")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 20, 2.8, 10)
+
+[node name="CanyonSecretStep2" parent="Architecture" instance=ExtResource("10_platform")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 22, 4.8, 14)
+
+[node name="CanyonSecretLedge" parent="Architecture" instance=ExtResource("10_platform")]
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 24, 6.5, 18)
+
 [node name="PlatHighCenter" parent="Architecture" unique_id=1646578023 instance=ExtResource("10_platform")]
 transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 2.6, -14)
 
@@ -238,10 +250,26 @@ crystal_type = 2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, -14)
 crystal_type = 3
 
+[node name="SecretRareCrystalCanyon" parent="Crystals" instance=ExtResource("6_crystal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 7.8, 18)
+crystal_type = 3
+
 [node name="Enemy" parent="." unique_id=361409283 instance=ExtResource("5_enemy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -8)
 patrol_speed = 4.4
 chase_speed = 6.6
+
+[node name="EnemyDrone" parent="." instance=ExtResource("14_drone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.8, -4)
+
+[node name="EnemyBrute" parent="." instance=ExtResource("15_brute")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.5, -8)
+
+[node name="LoreDatapad2" parent="." instance=ExtResource("16_datapad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 6.5, 17)
+archive_id = "DATA-02"
+archive_title = "Canyon Geothermal Logs"
+lore_text = "Thermal vents fuel the heavy brutes. Their armor deflects light rounds, but the core reacts to precision explosive impact."
 
 [node name="Player" parent="." unique_id=1274936185 instance=ExtResource("4_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 22)

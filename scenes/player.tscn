@@ -1,11 +1,12 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_script"]
 [ext_resource type="Material" path="res://assets/materials/mat_player_body.tres" id="2_body_mat"]
 [ext_resource type="Material" path="res://assets/materials/mat_player_accent.tres" id="3_accent_mat"]
-[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/ZC57/ZC57_Rigged.glb" id="4_pistol"]
-[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/MGP7/MGP7_Rigged.glb" id="5_smg"]
-[ext_resource type="PackedScene" path="res://assets/models/weapons/Guns/Grenades/M67V1_Rigged.glb" id="6_grenade"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons_lowpoly/weapon_pistol.glb" id="4_pistol"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons_lowpoly/weapon_smg.glb" id="5_smg"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons_lowpoly/weapon_grenade.glb" id="6_grenade"]
+[ext_resource type="PackedScene" path="res://assets/models/weapons_lowpoly/viewmodel_arms.glb" id="7_arms"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
@@ -129,15 +130,18 @@ fov = 75.0
 [node name="FpsWeaponSocket" type="Node3D" parent="Head/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, -0.2, -0.42)
 
+[node name="ViewModelArms" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("7_arms")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
 [node name="PistolModel" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("4_pistol")]
-transform = Transform3D(-5.24537e-10, 0, 0.012, 0, 0.012, 0, -0.012, 0, -5.24537e-10, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="SMGModel" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("5_smg")]
-transform = Transform3D(-3.27835e-08, 0, 0.75, 0, 0.75, 0, -0.75, 0, -3.27835e-08, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 visible = false
 
 [node name="GrenadeModel" parent="Head/Camera3D/FpsWeaponSocket" instance=ExtResource("6_grenade")]
-transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 visible = false
 
 [node name="MuzzlePoint" type="Node3D" parent="Head/Camera3D/FpsWeaponSocket"]
@@ -145,6 +149,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -0.35)
 
 [node name="MuzzleFlash" type="OmniLight3D" parent="Head/Camera3D/FpsWeaponSocket/MuzzlePoint"]
 visible = false
-light_color = Color(1, 0.85, 0.3, 1)
+light_color = Color(0.2, 0.9, 1, 1)
 light_energy = 3.0
 omni_range = 3.5

@@ -76,6 +76,7 @@ const BOT_NAMES := [
 ]
 
 func _ready() -> void:
+	Engine.time_scale = 1.0
 	add_to_group("battle_manager")
 	add_child(audio_mgr)
 	
@@ -83,6 +84,9 @@ func _ready() -> void:
 	_collect_spawn_points_and_waypoints()
 	
 	call_deferred("_start_match")
+
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0
 
 func _init_combatants() -> void:
 	scores["Unit-07"] = 0
@@ -93,7 +97,8 @@ func _init_combatants() -> void:
 
 func _collect_spawn_points_and_waypoints() -> void:
 	# Look for SpawnPoints group or generate from arena bounds
-	var sp_nodes = get_tree().get_nodes_in_group("spawn_points")
+	var tree := get_tree() if is_inside_tree() else null
+	var sp_nodes = tree.get_nodes_in_group("spawn_points") if tree else []
 	if not sp_nodes.is_empty():
 		for sp in sp_nodes:
 			if sp is Node3D:
@@ -154,7 +159,10 @@ func record_elimination(killer: Node3D, victim: Node3D) -> void:
 	if killer_str.is_empty():
 		killer_str = "Hazard"
 		
-	if scores.has(killer_str) and killer != victim:
+	if not scores.has(killer_str):
+		scores[killer_str] = 0
+		
+	if killer != victim:
 		scores[killer_str] += 1
 		
 	# Update leader
@@ -171,7 +179,8 @@ func record_elimination(killer: Node3D, victim: Node3D) -> void:
 		weapon_icon = "🔥 Barrel"
 		
 	kill_feed_announced.emit(killer_str, victim_str, weapon_icon)
-	quota_updated.emit(scores.get("Unit-07", 0), kill_quota, sector_title)
+	var p_kills: int = scores.get("Unit-07", 0)
+	quota_updated.emit(p_kills, kill_quota, sector_title)
 	scores_updated.emit(scores, leader_name, leader_score)
 	
 	# Check for Quota Achievement
@@ -250,11 +259,11 @@ func get_random_waypoint() -> Vector3:
 func _resolve_name(node: Node3D) -> String:
 	if not node:
 		return "Unknown"
-	if node.is_in_group("player"):
+	if node.is_in_group("player") or node.name == "Player" or node.name.begins_with("Player") or (node is CharacterBody3D and "character_name" in node and node.character_name == "Unit-07"):
 		return "Unit-07"
-	if "character_name" in node:
-		return node.character_name
-	if node is PropFuelBarrel:
+	if "character_name" in node and not str(node.character_name).is_empty():
+		return str(node.character_name)
+	if node is PropFuelBarrel or node.name.contains("Barrel"):
 		return "Fuel Barrel"
 	return node.name
 

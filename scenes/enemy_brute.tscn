@@ -1,0 +1,122 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_brute.gd" id="1_script"]
+[ext_resource type="Material" path="res://assets/materials/mat_enemy_body.tres" id="2_body_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_enemy_eye.tres" id="3_eye_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_neon_accent.tres" id="4_neon_mat"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_brute"]
+radius = 0.85
+height = 2.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_torso"]
+material = ExtResource("2_body_mat")
+size = Vector3(1.5, 1.2, 0.95)
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+material = ExtResource("2_body_mat")
+size = Vector3(0.65, 0.45, 0.55)
+
+[sub_resource type="BoxMesh" id="BoxMesh_visor"]
+material = ExtResource("3_eye_mat")
+size = Vector3(0.48, 0.12, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulder"]
+material = ExtResource("2_body_mat")
+size = Vector3(0.48, 0.5, 0.68)
+
+[sub_resource type="BoxMesh" id="BoxMesh_crusher_fist"]
+material = ExtResource("2_body_mat")
+size = Vector3(0.38, 0.95, 0.42)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mortar"]
+material = ExtResource("2_body_mat")
+top_radius = 0.22
+bottom_radius = 0.26
+height = 1.1
+radial_segments = 8
+
+[sub_resource type="TorusMesh" id="TorusMesh_shockwave"]
+material = ExtResource("4_neon_mat")
+inner_radius = 0.85
+outer_radius = 1.0
+
+[node name="EnemyBrute" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("CapsuleShape3D_brute")
+
+[node name="Model" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="Torso" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("BoxMesh_torso")
+
+[node name="Head" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -0.1)
+mesh = SubResource("BoxMesh_head")
+
+[node name="Visor" type="MeshInstance3D" parent="Model/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.26)
+mesh = SubResource("BoxMesh_visor")
+
+[node name="VisorLight" type="OmniLight3D" parent="Model/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.55)
+light_color = Color(1, 0.08, 0.08, 1)
+light_energy = 3.5
+omni_range = 6.0
+
+[node name="ShoulderL" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.02, 0.42, 0)
+mesh = SubResource("BoxMesh_shoulder")
+
+[node name="ShoulderR" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.02, 0.42, 0)
+mesh = SubResource("BoxMesh_shoulder")
+
+[node name="ArmL_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0.3, 0)
+
+[node name="CrusherFist" type="MeshInstance3D" parent="Model/ArmL_Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.45, -0.15)
+mesh = SubResource("BoxMesh_crusher_fist")
+
+[node name="ArmR_Pivot" type="Node3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0.3, 0)
+
+[node name="CannonBarrel" type="MeshInstance3D" parent="Model/ArmR_Pivot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, -0.15, -0.45)
+mesh = SubResource("CylinderMesh_mortar")
+
+[node name="Muzzle" type="Node3D" parent="Model/ArmR_Pivot/CannonBarrel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+
+[node name="LegBase" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+mesh = SubResource("BoxMesh_torso")
+
+[node name="Shockwave" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+visible = false
+mesh = SubResource("TorusMesh_shockwave")
+
+[node name="RayCastForward" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+target_position = Vector3(0, 0, -3.2)
+collision_mask = 1
+
+[node name="RayCastLeft" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+target_position = Vector3(-2.2, 0, -1.8)
+collision_mask = 1
+
+[node name="RayCastRight" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+target_position = Vector3(2.2, 0, -1.8)
+collision_mask = 1
+

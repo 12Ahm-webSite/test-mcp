@@ -53,6 +53,7 @@ var is_active: bool = true
 
 # Weapon Socket & Models (FPS viewmodel under camera prioritized)
 @onready var weapon_socket: Node3D = $Head/Camera3D/FpsWeaponSocket if has_node("Head/Camera3D/FpsWeaponSocket") else ($Model/WeaponSocket if has_node("Model/WeaponSocket") else null)
+@onready var viewmodel_arms: Node3D = weapon_socket.get_node("ViewModelArms") if weapon_socket and weapon_socket.has_node("ViewModelArms") else null
 @onready var pistol_model: Node3D = weapon_socket.get_node("PistolModel") if weapon_socket and weapon_socket.has_node("PistolModel") else null
 @onready var smg_model: Node3D = weapon_socket.get_node("SMGModel") if weapon_socket and weapon_socket.has_node("SMGModel") else null
 @onready var grenade_model: Node3D = weapon_socket.get_node("GrenadeModel") if weapon_socket and weapon_socket.has_node("GrenadeModel") else null
@@ -89,6 +90,12 @@ var _camera_pitch: float = deg_to_rad(-18.0)
 var _shake_trauma: float = 0.0
 
 # Jumps & Acrobatics state
+@export var coyote_time: float = 0.15
+@export var jump_buffer_time: float = 0.15
+var _coyote_timer: float = 0.0
+var _jump_buffer_timer: float = 0.0
+var _pre_land_velocity_y: float = 0.0
+var _squash_tween: Tween = null
 var _jump_count: int = 0
 var is_dashing: bool = false
 var _dash_timer: float = 0.0
@@ -246,13 +253,26 @@ func _physics_process(delta: float) -> void:
 	# Update active buffs
 	_update_buffs(delta)
 
-	# Apply gravity
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-	else:
+	# Floor tracking & Coyote time
+	if is_on_floor():
+		_coyote_timer = coyote_time
 		if velocity.y <= 0.0:
 			velocity.y = 0.0
 			_jump_count = 0
+	else:
+		_coyote_timer = maxf(0.0, _coyote_timer - delta)
+		velocity.y -= gravity * delta
+		_pre_land_velocity_y = velocity.y
+
+	# Out-of-bounds safety net (prevent clipping through world)
+	var curr_y: float = global_position.y if is_inside_tree() else position.y
+	if curr_y < -12.0:
+		var safe_pt := Vector3(0, 1.2, 0)
+		var tree := _get_safe_tree()
+		var bm = tree.get_first_node_in_group("battle_manager") if tree else null
+		if bm and bm.has_method("get_safe_spawn_point"):
+			safe_pt = bm.get_safe_spawn_point()
+		respawn_at(safe_pt)
 
 	# Update camera pivot tracking and trauma shake
 	_update_camera(delta)
@@ -276,14 +296,32 @@ func _physics_process(delta: float) -> void:
 		_update_procedural_animation(delta, dash_speed, Vector2.ZERO)
 		return
 
-	# Handle jump & double jump
+	# Handle jump input & buffering (with Coyote Time and Squash & Stretch)
 	if Input.is_action_just_pressed("jump"):
-		if is_on_floor() or _jump_count < max_jumps:
+		_jump_buffer_timer = jump_buffer_time
+
+	if _jump_buffer_timer > 0.0:
+		_jump_buffer_timer -= delta
+		if is_on_floor() or _coyote_timer > 0.0:
+			# Primary jump (including Coyote time forgiveness window)
 			velocity.y = jump_velocity
+			_jump_count = 1
+			_coyote_timer = 0.0
+			_jump_buffer_timer = 0.0
+			_apply_squash_and_stretch(Vector3(0.82, 1.25, 0.82), 0.16)
+			var tree := _get_safe_tree()
+			var audio = tree.get_first_node_in_group("audio_manager") if tree else null
+			if audio and audio.has_method("play_jump"):
+				audio.play_jump()
+		elif _jump_count < max_jumps and _jump_count > 0:
+			# Double jump
+			velocity.y = jump_velocity * 0.95
 			_jump_count += 1
-			if _jump_count == 2:
-				add_camera_shake(0.2) # Small punch on double jump
-			var audio = get_tree().get_first_node_in_group("audio_manager")
+			_jump_buffer_timer = 0.0
+			add_camera_shake(0.2)
+			_apply_squash_and_stretch(Vector3(0.85, 1.2, 0.85), 0.16)
+			var tree := _get_safe_tree()
+			var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 			if audio and audio.has_method("play_jump"):
 				audio.play_jump()
 
@@ -373,8 +411,10 @@ func _start_dash(move_dir: Vector3) -> void:
 	if not _is_first_person and model:
 		model.rotation.y = atan2(-_dash_direction.x, -_dash_direction.z)
 	add_camera_shake(0.35)
+	_apply_squash_and_stretch(Vector3(0.85, 0.9, 1.3), 0.2)
 	
-	var audio = get_tree().get_first_node_in_group("audio_manager")
+	var tree := _get_safe_tree()
+	var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 	if audio and audio.has_method("play_dash"):
 		audio.play_dash()
 
@@ -442,18 +482,32 @@ func activate_speed_boost(multiplier: float = 1.45, duration: float = 8.0) -> vo
 	speed_boost_remaining = duration
 	speed_boost_changed.emit(true, duration)
 
-func take_hit() -> bool:
+func _get_safe_tree() -> SceneTree:
+	return get_tree() if is_inside_tree() else null
+
+func take_hit(damage: float = 35.0, attacker: Node3D = null) -> bool:
 	if has_shield:
 		# Shield absorbs the hit!
 		deactivate_shield()
 		add_camera_shake(0.55)
-		var audio = get_tree().get_first_node_in_group("audio_manager")
+		var tree := _get_safe_tree()
+		var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 		if audio and audio.has_method("play_shield_hit"):
 			audio.play_shield_hit()
 		velocity.y = 4.0
 		return false # Survived!
-	take_damage(100.0)
-	return true # Fatal hit
+		
+	take_damage(damage, attacker)
+	
+	# Apply physical knockback impulse away from attacker
+	if attacker and is_instance_valid(attacker):
+		var p_pos: Vector3 = global_position if is_inside_tree() else position
+		var att_pos: Vector3 = attacker.global_position if (attacker is Node3D and attacker.is_inside_tree()) else (attacker.position if "position" in attacker else Vector3.ZERO)
+		var knock_dir := (p_pos - att_pos).normalized()
+		knock_dir.y = 0.35
+		velocity = knock_dir.normalized() * 11.5
+		
+	return health <= 0.0 # True if lethal, False if player survived!
 
 func take_damage(amount: float, attacker: Node3D = null) -> void:
 	if is_dead:
@@ -461,7 +515,8 @@ func take_damage(amount: float, attacker: Node3D = null) -> void:
 	if has_shield:
 		deactivate_shield()
 		add_camera_shake(0.55)
-		var audio = get_tree().get_first_node_in_group("audio_manager")
+		var tree := _get_safe_tree()
+		var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 		if audio and audio.has_method("play_shield_hit"):
 			audio.play_shield_hit()
 		velocity.y = 3.0
@@ -470,6 +525,11 @@ func take_damage(amount: float, attacker: Node3D = null) -> void:
 	health = maxf(0.0, health - amount)
 	health_changed.emit(health, max_health)
 	add_camera_shake(0.35)
+	
+	var tree := _get_safe_tree()
+	var audio = tree.get_first_node_in_group("audio_manager") if tree else null
+	if audio and audio.has_method("play_hit"):
+		audio.play_hit()
 	
 	if health <= 0.0:
 		_die(attacker)
@@ -486,12 +546,20 @@ func _die(killer: Node3D) -> void:
 	visible = false
 	player_eliminated.emit(killer)
 	
-	var bm = get_tree().get_first_node_in_group("battle_manager")
+	var tree := _get_safe_tree()
+	var bm = tree.get_first_node_in_group("battle_manager") if tree else null
 	if bm and bm.has_method("record_elimination"):
 		bm.record_elimination(killer, self)
+		
+	var gm = tree.get_first_node_in_group("game_manager") if tree else null
+	if gm and gm.has_method("trigger_game_over"):
+		gm.trigger_game_over(false)
 
 func respawn_at(pos: Vector3) -> void:
-	global_position = pos
+	if is_inside_tree():
+		global_position = pos
+	else:
+		position = pos
 	velocity = Vector3.ZERO
 	health = max_health
 	is_dead = false
@@ -540,6 +608,8 @@ func pickup_weapon(w_type: int, amount: int) -> void:
 		ammo_updated.emit(current_weapon, ammo.get(current_weapon, 0))
 
 func _update_weapon_models() -> void:
+	if viewmodel_arms:
+		viewmodel_arms.visible = _is_first_person
 	if pistol_model:
 		pistol_model.visible = (current_weapon == WeaponData.WeaponType.PISTOL)
 	if smg_model:
@@ -567,12 +637,14 @@ func try_shoot() -> bool:
 	_recoil_offset = 0.06
 	
 	# Muzzle flash
+	var tree := _get_safe_tree()
 	if muzzle_flash:
 		muzzle_flash.visible = true
-		get_tree().create_timer(0.05).timeout.connect(func(): if muzzle_flash: muzzle_flash.visible = false)
+		if tree:
+			tree.create_timer(0.05).timeout.connect(func(): if muzzle_flash: muzzle_flash.visible = false)
 		
 	# SFX
-	var audio = get_tree().get_first_node_in_group("audio_manager")
+	var audio = tree.get_first_node_in_group("audio_manager") if tree else null
 	var sfx_name: String = w_data.get("sfx_method", "play_pistol")
 	if audio and audio.has_method(sfx_name):
 		audio.call(sfx_name)
@@ -611,7 +683,9 @@ func _update_procedural_animation(delta: float, h_speed: float, input_dir: Vecto
 	# Detect landing impact
 	if is_on_floor() and not _was_on_floor:
 		_landing_squash = -0.12
-		add_camera_shake(0.18) # Camera bump on landing
+		var impact_factor := clampf(absf(_pre_land_velocity_y) / 15.0, 0.4, 1.2)
+		_apply_squash_and_stretch(Vector3(1.0 + 0.20 * impact_factor, 1.0 - 0.20 * impact_factor, 1.0 + 0.20 * impact_factor), 0.18)
+		add_camera_shake(0.18 * impact_factor) # Camera bump on landing
 	_was_on_floor = is_on_floor()
 
 	# Smooth landing recovery
@@ -679,3 +753,36 @@ func _update_procedural_animation(delta: float, h_speed: float, input_dir: Vecto
 		arm_r_pivot.rotation.z = lerp_angle(arm_r_pivot.rotation.z, deg_to_rad(3.0) - breath * deg_to_rad(1.5), 8.0 * delta)
 
 		model.position.y = _base_model_y + (breath * 0.012) + _landing_squash
+
+func _apply_squash_and_stretch(target_scale: Vector3, duration: float = 0.18) -> void:
+	if not model:
+		return
+	if _squash_tween and _squash_tween.is_valid():
+		_squash_tween.kill()
+	model.scale = target_scale
+	_squash_tween = create_tween()
+	_squash_tween.tween_property(model, "scale", Vector3.ONE, duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+var _hit_stop_active: bool = false
+
+func trigger_hit_stop(duration: float = 0.04, time_scale_val: float = 0.15) -> void:
+	if _hit_stop_active:
+		return
+	_hit_stop_active = true
+	Engine.time_scale = time_scale_val
+	var tree := get_tree() if is_inside_tree() else null
+	if not tree:
+		var ml = Engine.get_main_loop()
+		if ml is SceneTree:
+			tree = ml as SceneTree
+	if tree:
+		tree.create_timer(duration, true, false, true).timeout.connect(func():
+			Engine.time_scale = 1.0
+			_hit_stop_active = false
+		, CONNECT_ONE_SHOT)
+	else:
+		Engine.time_scale = 1.0
+		_hit_stop_active = false
+
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0

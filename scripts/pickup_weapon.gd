@@ -28,7 +28,8 @@ var _is_active: bool = true
 func _ready() -> void:
 	add_to_group("pickups")
 	_base_y = position.y
-	body_entered.connect(_on_body_entered)
+	if not body_entered.is_connected(_on_body_entered):
+		body_entered.connect(_on_body_entered)
 	_update_visuals()
 
 func _update_visuals() -> void:
@@ -40,18 +41,18 @@ func _update_visuals() -> void:
 		model_medkit.visible = (pickup_type == PickupType.MEDKIT)
 		
 	var theme_color := Color(0.2, 0.85, 1.0)
-	var label_text := "[ 💥 MGP7 RAPID SMG ]"
+	var label_text := "[ 💥 PLASMA SMG ]"
 	
 	match pickup_type:
 		PickupType.SMG:
 			theme_color = Color(0.2, 0.85, 1.0)
-			label_text = "[ 💥 MGP7 RAPID SMG ]"
+			label_text = "[ 💥 PLASMA SMG ]"
 		PickupType.GRENADE:
 			theme_color = Color(1.0, 0.5, 0.1)
-			label_text = "[ 💣 M67 GRENADES ]"
+			label_text = "[ 💣 CHRONO GRENADE ]"
 		PickupType.MEDKIT:
 			theme_color = Color(0.2, 1.0, 0.45)
-			label_text = "[ ❤️ MEDKIT (+35 HP) ]"
+			label_text = "[ ❤️ NANO-MEDKIT (+35 HP) ]"
 
 	if halo_light:
 		halo_light.light_color = theme_color

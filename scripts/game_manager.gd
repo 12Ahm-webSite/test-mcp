@@ -21,10 +21,14 @@ var is_portal_active: bool = false
 @onready var audio_mgr: Node = preload("res://scripts/audio_manager.gd").new()
 
 func _ready() -> void:
+	Engine.time_scale = 1.0
 	add_to_group("game_manager")
 	add_child(save_mgr)
 	add_child(audio_mgr)
 	call_deferred("_init_level")
+
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0
 
 func _init_level() -> void:
 	energy_updated.emit(collected_energy_crystals, required_energy_crystals)
@@ -36,6 +40,12 @@ func _init_level() -> void:
 func _process(delta: float) -> void:
 	if not is_game_over:
 		elapsed_time += delta
+
+func add_score(amount: int) -> void:
+	if is_game_over:
+		return
+	current_score += amount
+	score_updated.emit(current_score)
 
 func collect_crystal(crystal_type: int, score: int) -> void:
 	if is_game_over:
