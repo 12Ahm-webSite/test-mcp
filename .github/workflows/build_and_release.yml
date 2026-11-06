@@ -33,8 +33,12 @@ jobs:
 
       - name: Accept Android Licenses & Install Build Tools
         run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34" || true
+          sdkmanager --licenses < /dev/null
+
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0"
 
       - name: Install System Dependencies
         run: |
