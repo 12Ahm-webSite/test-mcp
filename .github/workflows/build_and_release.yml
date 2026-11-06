@@ -72,22 +72,25 @@ jobs:
           fi
 
           mkdir -p ~/.config/godot
-          cat << EOF > ~/.config/godot/editor_settings-4.7.tres
-          [gd_resource type="EditorSettings" format=3]
+          cat > ~/.config/godot/editor_settings-4.7.tres << EOF
+[gd_resource type="EditorSettings" format=3]
 
-          [resource]
-          export/android/android_sdk_path = "$ANDROID_HOME"
-          export/android/debug_keystore = "$GITHUB_WORKSPACE/debug.keystore"
-          export/android/debug_keystore_pass = "android"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/java_sdk_path = "$JAVA_HOME"
-          EOF
+[resource]
+export/android/android_sdk_path = "${ANDROID_HOME}"
+export/android/debug_keystore = "${GITHUB_WORKSPACE}/debug.keystore"
+export/android/debug_keystore_pass = "android"
+export/android/debug_keystore_user = "androiddebugkey"
+export/android/java_sdk_path = "${JAVA_HOME}"
+EOF
           cp ~/.config/godot/editor_settings-4.7.tres ~/.config/godot/editor_settings-4.tres
+          cp ~/.config/godot/editor_settings-4.7.tres ~/.config/godot/editor_settings-4.7.2.tres
+          echo "Generated EditorSettings:"
+          cat ~/.config/godot/editor_settings-4.7.tres
 
       - name: Export APK
         run: |
           mkdir -p build/android
-          godot --headless --export-release "Android" build/android/Crystal_Rush.apk
+          godot --headless --verbose --export-release "Android" build/android/Crystal_Rush.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
