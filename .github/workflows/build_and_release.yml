@@ -23,13 +23,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Accept Android Licenses & Install Build Tools
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34" || true
 
       - name: Install System Dependencies
         run: |
@@ -39,6 +44,7 @@ jobs:
       - name: Download Godot 4.7.2 & Export Templates
         run: |
           GODOT_RELEASE="4.7.2-stable"
+          GODOT_VERSION="4.7.2.stable"
           wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip
           unzip -q Godot_v${GODOT_RELEASE}_linux.x86_64.zip
           sudo mv Godot_v${GODOT_RELEASE}_linux.x86_64 /usr/local/bin/godot
@@ -46,8 +52,18 @@ jobs:
 
           wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz
           unzip -q Godot_v${GODOT_RELEASE}_export_templates.tpz
+
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}
+          cp -r templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}/
+
           mkdir -p ~/.local/share/godot/export_templates/${GODOT_RELEASE}
-          mv templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+          cp -r templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+
+          mkdir -p ~/.local/share/godot/templates/${GODOT_VERSION}
+          cp -r templates/* ~/.local/share/godot/templates/${GODOT_VERSION}/
+
+          mkdir -p ~/.local/share/godot/templates/${GODOT_RELEASE}
+          cp -r templates/* ~/.local/share/godot/templates/${GODOT_RELEASE}/
 
       - name: Configure Godot Android Settings & Keystore
         run: |
@@ -97,6 +113,7 @@ jobs:
       - name: Download Godot 4.7.2 & Export Templates
         run: |
           GODOT_RELEASE="4.7.2-stable"
+          GODOT_VERSION="4.7.2.stable"
           wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip
           unzip -q Godot_v${GODOT_RELEASE}_linux.x86_64.zip
           sudo mv Godot_v${GODOT_RELEASE}_linux.x86_64 /usr/local/bin/godot
@@ -104,8 +121,18 @@ jobs:
 
           wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz
           unzip -q Godot_v${GODOT_RELEASE}_export_templates.tpz
+
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}
+          cp -r templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}/
+
           mkdir -p ~/.local/share/godot/export_templates/${GODOT_RELEASE}
-          mv templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+          cp -r templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+
+          mkdir -p ~/.local/share/godot/templates/${GODOT_VERSION}
+          cp -r templates/* ~/.local/share/godot/templates/${GODOT_VERSION}/
+
+          mkdir -p ~/.local/share/godot/templates/${GODOT_RELEASE}
+          cp -r templates/* ~/.local/share/godot/templates/${GODOT_RELEASE}/
 
       - name: Export Windows EXE
         run: |
@@ -137,6 +164,7 @@ jobs:
       - name: Download Godot 4.7.2 & Export Templates
         run: |
           GODOT_RELEASE="4.7.2-stable"
+          GODOT_VERSION="4.7.2.stable"
           wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip
           unzip -q Godot_v${GODOT_RELEASE}_linux.x86_64.zip
           sudo mv Godot_v${GODOT_RELEASE}_linux.x86_64 /usr/local/bin/godot
@@ -144,8 +172,18 @@ jobs:
 
           wget -q https://github.com/godotengine/godot/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz
           unzip -q Godot_v${GODOT_RELEASE}_export_templates.tpz
+
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}
+          cp -r templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}/
+
           mkdir -p ~/.local/share/godot/export_templates/${GODOT_RELEASE}
-          mv templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+          cp -r templates/* ~/.local/share/godot/export_templates/${GODOT_RELEASE}/
+
+          mkdir -p ~/.local/share/godot/templates/${GODOT_VERSION}
+          cp -r templates/* ~/.local/share/godot/templates/${GODOT_VERSION}/
+
+          mkdir -p ~/.local/share/godot/templates/${GODOT_RELEASE}
+          cp -r templates/* ~/.local/share/godot/templates/${GODOT_RELEASE}/
 
       - name: Export Linux Binary
         run: |
