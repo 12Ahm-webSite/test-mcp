@@ -88,7 +88,7 @@ jobs:
       - name: Export APK
         run: |
           mkdir -p build/android
-          godot --headless --verbose --export-release "Android" build/android/Crystal_Rush.apk
+          godot --headless --export-release "Android" build/android/Crystal_Rush.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ckrla6okm70dk"
 path.s3tc="res://.godot/imported/FuelBarrelV1_Destroyed_AlstraInifnite_256_MainTexture.png-7b7c92ac06e6fe2326467c5f747e6238.s3tc.ctex"
+path.etc2="res://.godot/imported/FuelBarrelV1_Destroyed_AlstraInifnite_256_MainTexture.png-7b7c92ac06e6fe2326467c5f747e6238.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/FuelBarrelV1_Destroyed_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/FuelBarrelV1_Destroyed_AlstraInifnite_256_MainTexture.png-7b7c92ac06e6fe2326467c5f747e6238.s3tc.ctex"]
+dest_files=["res://.godot/imported/FuelBarrelV1_Destroyed_AlstraInifnite_256_MainTexture.png-7b7c92ac06e6fe2326467c5f747e6238.s3tc.ctex", "res://.godot/imported/FuelBarrelV1_Destroyed_AlstraInifnite_256_MainTexture.png-7b7c92ac06e6fe2326467c5f747e6238.etc2.ctex"]
 
 [params]
 

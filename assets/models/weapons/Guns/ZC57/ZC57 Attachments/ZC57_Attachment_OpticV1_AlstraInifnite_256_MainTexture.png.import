@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://d3pido88bd3wl"
 path.s3tc="res://.godot/imported/ZC57_Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-0da5e577f5034c2f0d5f51fd2fb42023.s3tc.ctex"
+path.etc2="res://.godot/imported/ZC57_Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-0da5e577f5034c2f0d5f51fd2fb42023.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Guns/ZC57/ZC57 Attachments/ZC57_Attachment_OpticV1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/ZC57_Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-0da5e577f5034c2f0d5f51fd2fb42023.s3tc.ctex"]
+dest_files=["res://.godot/imported/ZC57_Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-0da5e577f5034c2f0d5f51fd2fb42023.s3tc.ctex", "res://.godot/imported/ZC57_Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-0da5e577f5034c2f0d5f51fd2fb42023.etc2.ctex"]
 
 [params]
 
