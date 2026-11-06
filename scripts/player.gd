@@ -281,7 +281,7 @@ func _physics_process(delta: float) -> void:
 	# Continuous automatic firing
 	var is_firing := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_action_pressed("shoot") or _touch_fire_active
 	if is_active and not is_dead and is_firing:
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or _touch_fire_active or OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or _touch_fire_active or OS.has_feature("android") or OS.has_feature("ios"):
 			var w_data = WeaponData.get_weapon(current_weapon)
 			if w_data.get("is_automatic", false):
 				try_shoot()

@@ -32,8 +32,10 @@ func _ready() -> void:
 				manual_touch = bool(parsed["settings"].get("touch_controls_enabled", false))
 			file.close()
 
-	# Configure mobile visibility
-	var is_mobile := OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios") or DisplayServer.is_touchscreen_available()
+	# Configure mobile visibility:
+	# Auto-enable ONLY on genuine mobile devices (Android, iOS)
+	var is_desktop := OS.has_feature("pc") or OS.has_feature("windows") or OS.has_feature("linux") or OS.has_feature("macos") or OS.has_feature("bsd")
+	var is_mobile := (OS.has_feature("android") or OS.has_feature("ios")) and not is_desktop
 	visible = is_mobile or manual_touch or force_show_for_testing
 	
 	if joystick_base:
