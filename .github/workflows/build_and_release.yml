@@ -28,17 +28,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android Licenses & Install Build Tools
+      - name: Set up Android SDK Environment
         run: |
-          sdkmanager --licenses < /dev/null
+          ANDROID_HOME="/usr/local/lib/android/sdk"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/build-tools/34.0.0" >> $GITHUB_PATH
 
-          sdkmanager \
-            "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;34.0.0"
+      - name: Accept Android SDK Licenses
+        run: |
+          export ANDROID_HOME="/usr/local/lib/android/sdk"
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          yes | sdkmanager --licenses || true
 
       - name: Install System Dependencies
         run: |
@@ -76,7 +79,7 @@ jobs:
           fi
 
           mkdir -p ~/.config/godot
-          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/android_sdk_path = "%%s"\nexport/android/debug_keystore = "%%s"\nexport/android/debug_keystore_pass = "android"\nexport/android/debug_keystore_user = "androiddebugkey"\nexport/android/java_sdk_path = "%%s"\n' "$ANDROID_HOME" "$GITHUB_WORKSPACE/debug.keystore" "$JAVA_HOME" > ~/.config/godot/editor_settings-4.7.tres
+          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/android_sdk_path = "%s"\nexport/android/debug_keystore = "%s"\nexport/android/debug_keystore_pass = "android"\nexport/android/debug_keystore_user = "androiddebugkey"\nexport/android/java_sdk_path = "%s"\n' "$ANDROID_HOME" "$GITHUB_WORKSPACE/debug.keystore" "$JAVA_HOME" > ~/.config/godot/editor_settings-4.7.tres
           cp ~/.config/godot/editor_settings-4.7.tres ~/.config/godot/editor_settings-4.tres
           cp ~/.config/godot/editor_settings-4.7.tres ~/.config/godot/editor_settings-4.7.2.tres
           echo "Generated EditorSettings:"
