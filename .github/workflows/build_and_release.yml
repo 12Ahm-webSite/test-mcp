@@ -268,8 +268,8 @@ jobs:
             final_release/Crystal_Rush.apk
             final_release/Crystal_Rush_Windows.zip
             final_release/crystal-rush_1.0.0_amd64.deb
-          tag_name: ${{ github.ref_name || 'v1.0.0' }}
-          name: Crystal Rush ${{ github.ref_name || 'v1.0.0' }}
+          tag_name: ${{ github.ref_name }}
+          name: Crystal Rush ${{ github.ref_name }}
           body: |
             ### 🎮 Crystal Rush — Official Builds
             
