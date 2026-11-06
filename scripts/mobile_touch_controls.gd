@@ -33,10 +33,10 @@ func _ready() -> void:
 			file.close()
 
 	# Configure mobile visibility:
-	# Auto-enable ONLY on genuine mobile devices (Android, iOS)
-	var is_desktop := OS.has_feature("pc") or OS.has_feature("windows") or OS.has_feature("linux") or OS.has_feature("macos") or OS.has_feature("bsd")
-	var is_mobile := (OS.has_feature("android") or OS.has_feature("ios")) and not is_desktop
-	visible = is_mobile or manual_touch or force_show_for_testing
+	# Touch controls MUST only appear on actual mobile platforms (Android, iOS).
+	# On PC / Laptop (Linux, Windows, macOS), they are permanently hidden.
+	var is_mobile := OS.has_feature("android") or OS.has_feature("ios") or OS.get_name() == "Android" or OS.get_name() == "iOS"
+	visible = is_mobile or force_show_for_testing
 	
 	if joystick_base:
 		_joystick_default_pos = joystick_base.position
