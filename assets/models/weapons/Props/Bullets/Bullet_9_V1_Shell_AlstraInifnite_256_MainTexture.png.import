@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://xjh3a4n36bwg"
 path.s3tc="res://.godot/imported/Bullet_9_V1_Shell_AlstraInifnite_256_MainTexture.png-e376afeb387d2003d0facf01f64e20b3.s3tc.ctex"
-path.etc2="res://.godot/imported/Bullet_9_V1_Shell_AlstraInifnite_256_MainTexture.png-e376afeb387d2003d0facf01f64e20b3.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/Bullets/Bullet_9_V1_Shell_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/Bullet_9_V1_Shell_AlstraInifnite_256_MainTexture.png-e376afeb387d2003d0facf01f64e20b3.s3tc.ctex", "res://.godot/imported/Bullet_9_V1_Shell_AlstraInifnite_256_MainTexture.png-e376afeb387d2003d0facf01f64e20b3.etc2.ctex"]
+dest_files=["res://.godot/imported/Bullet_9_V1_Shell_AlstraInifnite_256_MainTexture.png-e376afeb387d2003d0facf01f64e20b3.s3tc.ctex"]
 
 [params]
 

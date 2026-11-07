@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://uw0i3l3gx16s"
 path.s3tc="res://.godot/imported/MedKitV1_AlstraInifnite_256_MainTexture.png-491671d071aab91677fc81f5746f3b76.s3tc.ctex"
-path.etc2="res://.godot/imported/MedKitV1_AlstraInifnite_256_MainTexture.png-491671d071aab91677fc81f5746f3b76.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/MedKitV1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/MedKitV1_AlstraInifnite_256_MainTexture.png-491671d071aab91677fc81f5746f3b76.s3tc.ctex", "res://.godot/imported/MedKitV1_AlstraInifnite_256_MainTexture.png-491671d071aab91677fc81f5746f3b76.etc2.ctex"]
+dest_files=["res://.godot/imported/MedKitV1_AlstraInifnite_256_MainTexture.png-491671d071aab91677fc81f5746f3b76.s3tc.ctex"]
 
 [params]
 

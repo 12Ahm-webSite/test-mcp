@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://d0esipmoi6fav"
 path.s3tc="res://.godot/imported/Attachment_Foregrip_V1_AlstraInifnite_256_MainTexture.png-c9f355d67546a467d5507f76043fdb65.s3tc.ctex"
-path.etc2="res://.godot/imported/Attachment_Foregrip_V1_AlstraInifnite_256_MainTexture.png-c9f355d67546a467d5507f76043fdb65.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Guns/Attachments - Universal/Attachment_Foregrip_V1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/Attachment_Foregrip_V1_AlstraInifnite_256_MainTexture.png-c9f355d67546a467d5507f76043fdb65.s3tc.ctex", "res://.godot/imported/Attachment_Foregrip_V1_AlstraInifnite_256_MainTexture.png-c9f355d67546a467d5507f76043fdb65.etc2.ctex"]
+dest_files=["res://.godot/imported/Attachment_Foregrip_V1_AlstraInifnite_256_MainTexture.png-c9f355d67546a467d5507f76043fdb65.s3tc.ctex"]
 
 [params]
 

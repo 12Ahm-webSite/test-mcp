@@ -41,3 +41,7 @@ pointing/emulate_mouse_from_touch=true
 
 textures/vram_compression/import_etc2_astc=true
 rendering_device/driver.windows="d3d12"
+
+[internationalization]
+
+rendering/root_node_layout_direction=1

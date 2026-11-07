@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bthr8pp71esv7"
 path.s3tc="res://.godot/imported/M67V1_Rigged_AlstraInifnite_256_MainTexture.png-ec88d4c225818948c4e4c705c1fb484c.s3tc.ctex"
-path.etc2="res://.godot/imported/M67V1_Rigged_AlstraInifnite_256_MainTexture.png-ec88d4c225818948c4e4c705c1fb484c.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Guns/Grenades/M67V1_Rigged_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/M67V1_Rigged_AlstraInifnite_256_MainTexture.png-ec88d4c225818948c4e4c705c1fb484c.s3tc.ctex", "res://.godot/imported/M67V1_Rigged_AlstraInifnite_256_MainTexture.png-ec88d4c225818948c4e4c705c1fb484c.etc2.ctex"]
+dest_files=["res://.godot/imported/M67V1_Rigged_AlstraInifnite_256_MainTexture.png-ec88d4c225818948c4e4c705c1fb484c.s3tc.ctex"]
 
 [params]
 

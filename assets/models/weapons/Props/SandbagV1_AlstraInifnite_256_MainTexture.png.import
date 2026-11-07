@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://by0s5sxxur20r"
 path.s3tc="res://.godot/imported/SandbagV1_AlstraInifnite_256_MainTexture.png-534dc0a4aabb68e3de6e3324045213ee.s3tc.ctex"
-path.etc2="res://.godot/imported/SandbagV1_AlstraInifnite_256_MainTexture.png-534dc0a4aabb68e3de6e3324045213ee.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/SandbagV1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/SandbagV1_AlstraInifnite_256_MainTexture.png-534dc0a4aabb68e3de6e3324045213ee.s3tc.ctex", "res://.godot/imported/SandbagV1_AlstraInifnite_256_MainTexture.png-534dc0a4aabb68e3de6e3324045213ee.etc2.ctex"]
+dest_files=["res://.godot/imported/SandbagV1_AlstraInifnite_256_MainTexture.png-534dc0a4aabb68e3de6e3324045213ee.s3tc.ctex"]
 
 [params]
 

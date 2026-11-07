@@ -21,6 +21,14 @@ var _joystick_default_pos: Vector2 = Vector2.ZERO
 @onready var look_zone: Control = $LookZone if has_node("LookZone") else null
 
 func _ready() -> void:
+	layout_direction = Control.LAYOUT_DIRECTION_LTR
+	if has_node("JoystickContainer"):
+		$JoystickContainer.layout_direction = Control.LAYOUT_DIRECTION_LTR
+	if has_node("ActionsContainer"):
+		$ActionsContainer.layout_direction = Control.LAYOUT_DIRECTION_LTR
+	if look_zone:
+		look_zone.layout_direction = Control.LAYOUT_DIRECTION_LTR
+
 	_ensure_input_actions()
 	var manual_touch := false
 	var save_path := "user://crystal_rush_save.json"

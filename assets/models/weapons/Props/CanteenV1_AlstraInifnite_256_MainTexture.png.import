@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dpq56ti5ryt6t"
 path.s3tc="res://.godot/imported/CanteenV1_AlstraInifnite_256_MainTexture.png-74e5bb0798a482085947e3f2b9a84f9a.s3tc.ctex"
-path.etc2="res://.godot/imported/CanteenV1_AlstraInifnite_256_MainTexture.png-74e5bb0798a482085947e3f2b9a84f9a.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/CanteenV1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/CanteenV1_AlstraInifnite_256_MainTexture.png-74e5bb0798a482085947e3f2b9a84f9a.s3tc.ctex", "res://.godot/imported/CanteenV1_AlstraInifnite_256_MainTexture.png-74e5bb0798a482085947e3f2b9a84f9a.etc2.ctex"]
+dest_files=["res://.godot/imported/CanteenV1_AlstraInifnite_256_MainTexture.png-74e5bb0798a482085947e3f2b9a84f9a.s3tc.ctex"]
 
 [params]
 

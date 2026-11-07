@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bax14lxxc0l50"
 path.s3tc="res://.godot/imported/SandbagCurvedWallV1_AlstraInifnite_256_MainTexture.png-8c3a9786499c8b62daa6dbff0436c57f.s3tc.ctex"
-path.etc2="res://.godot/imported/SandbagCurvedWallV1_AlstraInifnite_256_MainTexture.png-8c3a9786499c8b62daa6dbff0436c57f.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/SandbagCurvedWallV1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/SandbagCurvedWallV1_AlstraInifnite_256_MainTexture.png-8c3a9786499c8b62daa6dbff0436c57f.s3tc.ctex", "res://.godot/imported/SandbagCurvedWallV1_AlstraInifnite_256_MainTexture.png-8c3a9786499c8b62daa6dbff0436c57f.etc2.ctex"]
+dest_files=["res://.godot/imported/SandbagCurvedWallV1_AlstraInifnite_256_MainTexture.png-8c3a9786499c8b62daa6dbff0436c57f.s3tc.ctex"]
 
 [params]
 

@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cjoiy0e1wxl8r"
 path.s3tc="res://.godot/imported/wall_dungeon_texture.png-bd4f7cf7d459574eb26ed50db558ff5b.s3tc.ctex"
-path.etc2="res://.godot/imported/wall_dungeon_texture.png-bd4f7cf7d459574eb26ed50db558ff5b.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/wall_dungeon_texture.png"
-dest_files=["res://.godot/imported/wall_dungeon_texture.png-bd4f7cf7d459574eb26ed50db558ff5b.s3tc.ctex", "res://.godot/imported/wall_dungeon_texture.png-bd4f7cf7d459574eb26ed50db558ff5b.etc2.ctex"]
+dest_files=["res://.godot/imported/wall_dungeon_texture.png-bd4f7cf7d459574eb26ed50db558ff5b.s3tc.ctex"]
 
 [params]
 

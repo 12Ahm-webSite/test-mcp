@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bksarjsl2g3pp"
 path.s3tc="res://.godot/imported/ZC57_Rigged_AlstraInifnite_256_MainTexture.png-16e8be35a02a956670c80f8f9ec8fbb6.s3tc.ctex"
-path.etc2="res://.godot/imported/ZC57_Rigged_AlstraInifnite_256_MainTexture.png-16e8be35a02a956670c80f8f9ec8fbb6.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Guns/ZC57/ZC57_Rigged_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/ZC57_Rigged_AlstraInifnite_256_MainTexture.png-16e8be35a02a956670c80f8f9ec8fbb6.s3tc.ctex", "res://.godot/imported/ZC57_Rigged_AlstraInifnite_256_MainTexture.png-16e8be35a02a956670c80f8f9ec8fbb6.etc2.ctex"]
+dest_files=["res://.godot/imported/ZC57_Rigged_AlstraInifnite_256_MainTexture.png-16e8be35a02a956670c80f8f9ec8fbb6.s3tc.ctex"]
 
 [params]
 

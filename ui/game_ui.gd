@@ -57,6 +57,11 @@ var _toast_tween: Tween = null
 var _is_paused: bool = false
 
 func _ready() -> void:
+	if hud:
+		hud.layout_direction = Control.LAYOUT_DIRECTION_LTR
+	if modals:
+		modals.layout_direction = Control.LAYOUT_DIRECTION_LTR
+
 	# Hide modals initially
 	level_clear_panel.visible = false
 	game_over_panel.visible = false

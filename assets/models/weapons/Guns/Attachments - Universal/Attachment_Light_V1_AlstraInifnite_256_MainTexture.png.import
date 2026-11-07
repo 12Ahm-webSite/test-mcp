@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ywm2nkmnbtbx"
 path.s3tc="res://.godot/imported/Attachment_Light_V1_AlstraInifnite_256_MainTexture.png-5b063ec718d5eaca84660f6fb4433110.s3tc.ctex"
-path.etc2="res://.godot/imported/Attachment_Light_V1_AlstraInifnite_256_MainTexture.png-5b063ec718d5eaca84660f6fb4433110.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Guns/Attachments - Universal/Attachment_Light_V1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/Attachment_Light_V1_AlstraInifnite_256_MainTexture.png-5b063ec718d5eaca84660f6fb4433110.s3tc.ctex", "res://.godot/imported/Attachment_Light_V1_AlstraInifnite_256_MainTexture.png-5b063ec718d5eaca84660f6fb4433110.etc2.ctex"]
+dest_files=["res://.godot/imported/Attachment_Light_V1_AlstraInifnite_256_MainTexture.png-5b063ec718d5eaca84660f6fb4433110.s3tc.ctex"]
 
 [params]
 

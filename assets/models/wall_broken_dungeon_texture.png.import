@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwcwaqnji15py"
 path.s3tc="res://.godot/imported/wall_broken_dungeon_texture.png-a08d85919e93e97854596c213ea28a00.s3tc.ctex"
-path.etc2="res://.godot/imported/wall_broken_dungeon_texture.png-a08d85919e93e97854596c213ea28a00.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/wall_broken_dungeon_texture.png"
-dest_files=["res://.godot/imported/wall_broken_dungeon_texture.png-a08d85919e93e97854596c213ea28a00.s3tc.ctex", "res://.godot/imported/wall_broken_dungeon_texture.png-a08d85919e93e97854596c213ea28a00.etc2.ctex"]
+dest_files=["res://.godot/imported/wall_broken_dungeon_texture.png-a08d85919e93e97854596c213ea28a00.s3tc.ctex"]
 
 [params]
 

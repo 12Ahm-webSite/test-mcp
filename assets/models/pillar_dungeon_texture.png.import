@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://du45xqqieerj"
 path.s3tc="res://.godot/imported/pillar_dungeon_texture.png-11331f1786caaca85e4a0be22a684ff2.s3tc.ctex"
-path.etc2="res://.godot/imported/pillar_dungeon_texture.png-11331f1786caaca85e4a0be22a684ff2.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/pillar_dungeon_texture.png"
-dest_files=["res://.godot/imported/pillar_dungeon_texture.png-11331f1786caaca85e4a0be22a684ff2.s3tc.ctex", "res://.godot/imported/pillar_dungeon_texture.png-11331f1786caaca85e4a0be22a684ff2.etc2.ctex"]
+dest_files=["res://.godot/imported/pillar_dungeon_texture.png-11331f1786caaca85e4a0be22a684ff2.s3tc.ctex"]
 
 [params]
 

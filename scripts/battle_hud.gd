@@ -82,11 +82,18 @@ func _ensure_nodes() -> void:
 		crosshair_label = get_node_or_null("Crosshair/Label")
 
 func _ready() -> void:
+	layout_direction = Control.LAYOUT_DIRECTION_LTR
 	_ensure_nodes()
 	if alert_banner:
 		alert_banner.modulate.a = 0.0
 	if end_screen:
 		end_screen.visible = false
+		
+	var mobile_ctrl := get_node_or_null("MobileTouchControls") as Control
+	var bottom_rt := get_node_or_null("BottomRight") as Control
+	if mobile_ctrl and mobile_ctrl.visible and bottom_rt:
+		bottom_rt.offset_top = -280.0
+		bottom_rt.offset_bottom = -210.0
 		
 	if btn_restart:
 		btn_restart.pressed.connect(_on_restart_pressed)

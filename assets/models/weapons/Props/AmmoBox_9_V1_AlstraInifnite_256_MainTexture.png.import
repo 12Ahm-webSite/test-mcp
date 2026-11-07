@@ -4,9 +4,8 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://coj3lfj7umbt"
 path.s3tc="res://.godot/imported/AmmoBox_9_V1_AlstraInifnite_256_MainTexture.png-3e01d1ee0670ecf8746d22278298c412.s3tc.ctex"
-path.etc2="res://.godot/imported/AmmoBox_9_V1_AlstraInifnite_256_MainTexture.png-3e01d1ee0670ecf8746d22278298c412.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -16,7 +15,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/AmmoBox_9_V1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/AmmoBox_9_V1_AlstraInifnite_256_MainTexture.png-3e01d1ee0670ecf8746d22278298c412.s3tc.ctex", "res://.godot/imported/AmmoBox_9_V1_AlstraInifnite_256_MainTexture.png-3e01d1ee0670ecf8746d22278298c412.etc2.ctex"]
+dest_files=["res://.godot/imported/AmmoBox_9_V1_AlstraInifnite_256_MainTexture.png-3e01d1ee0670ecf8746d22278298c412.s3tc.ctex"]
 
 [params]
 
