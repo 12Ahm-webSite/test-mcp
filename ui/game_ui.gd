@@ -21,6 +21,9 @@ extends CanvasLayer
 @onready var threat_container: PanelContainer = $HUD/TopCenter/VBox/ThreatContainer if has_node("HUD/TopCenter/VBox/ThreatContainer") else get_node_or_null("HUD/TopCenter/ThreatContainer")
 @onready var threat_label: Label = $HUD/TopCenter/VBox/ThreatContainer/ThreatLabel if has_node("HUD/TopCenter/VBox/ThreatContainer/ThreatLabel") else get_node_or_null("HUD/TopCenter/ThreatContainer/ThreatLabel")
 
+@onready var hud: Control = $HUD if has_node("HUD") else null
+@onready var modals: Control = $Modals if has_node("Modals") else null
+
 # --- Toast Banner ---
 @onready var toast_panel: PanelContainer = $HUD/CenterNotice/ToastPanel
 @onready var toast_label: Label = $HUD/CenterNotice/ToastPanel/ToastLabel

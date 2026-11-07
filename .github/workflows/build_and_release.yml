@@ -85,6 +85,10 @@ jobs:
           echo "Generated EditorSettings:"
           cat ~/.config/godot/editor_settings-4.7.tres
 
+      - name: Import Assets
+        run: |
+          godot --headless --editor --quit || true
+
       - name: Export APK
         run: |
           mkdir -p build/android
@@ -134,6 +138,10 @@ jobs:
 
           mkdir -p ~/.local/share/godot/templates/${GODOT_RELEASE}
           cp -r templates/* ~/.local/share/godot/templates/${GODOT_RELEASE}/
+
+      - name: Import Assets
+        run: |
+          godot --headless --editor --quit || true
 
       - name: Export Windows EXE
         run: |
@@ -185,6 +193,10 @@ jobs:
 
           mkdir -p ~/.local/share/godot/templates/${GODOT_RELEASE}
           cp -r templates/* ~/.local/share/godot/templates/${GODOT_RELEASE}/
+
+      - name: Import Assets
+        run: |
+          godot --headless --editor --quit || true
 
       - name: Export Linux Binary
         run: |
