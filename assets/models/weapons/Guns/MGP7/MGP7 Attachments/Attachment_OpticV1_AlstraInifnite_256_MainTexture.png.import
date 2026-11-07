@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://d7o76vw133xk"
 path.s3tc="res://.godot/imported/Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-4a65c305b25bf63c1f21fb80fa31e42a.s3tc.ctex"
+path.etc2="res://.godot/imported/Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-4a65c305b25bf63c1f21fb80fa31e42a.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Guns/MGP7/MGP7 Attachments/Attachment_OpticV1_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-4a65c305b25bf63c1f21fb80fa31e42a.s3tc.ctex"]
+dest_files=["res://.godot/imported/Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-4a65c305b25bf63c1f21fb80fa31e42a.s3tc.ctex", "res://.godot/imported/Attachment_OpticV1_AlstraInifnite_256_MainTexture.png-4a65c305b25bf63c1f21fb80fa31e42a.etc2.ctex"]
 
 [params]
 

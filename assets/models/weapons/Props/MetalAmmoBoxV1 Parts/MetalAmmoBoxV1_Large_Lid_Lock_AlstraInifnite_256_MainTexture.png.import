@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cksvb4fxftvuf"
 path.s3tc="res://.godot/imported/MetalAmmoBoxV1_Large_Lid_Lock_AlstraInifnite_256_MainTexture.png-1a0270d7e506776d76350a0a03e5fe5d.s3tc.ctex"
+path.etc2="res://.godot/imported/MetalAmmoBoxV1_Large_Lid_Lock_AlstraInifnite_256_MainTexture.png-1a0270d7e506776d76350a0a03e5fe5d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/weapons/Props/MetalAmmoBoxV1 Parts/MetalAmmoBoxV1_Large_Lid_Lock_AlstraInifnite_256_MainTexture.png"
-dest_files=["res://.godot/imported/MetalAmmoBoxV1_Large_Lid_Lock_AlstraInifnite_256_MainTexture.png-1a0270d7e506776d76350a0a03e5fe5d.s3tc.ctex"]
+dest_files=["res://.godot/imported/MetalAmmoBoxV1_Large_Lid_Lock_AlstraInifnite_256_MainTexture.png-1a0270d7e506776d76350a0a03e5fe5d.s3tc.ctex", "res://.godot/imported/MetalAmmoBoxV1_Large_Lid_Lock_AlstraInifnite_256_MainTexture.png-1a0270d7e506776d76350a0a03e5fe5d.etc2.ctex"]
 
 [params]
 
